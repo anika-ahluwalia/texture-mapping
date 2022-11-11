@@ -26,5 +26,8 @@ public:
     // @param renderData  On return, this will contain the metadata of the loaded scene.
     // @return            A boolean value indicating whether the parse was successful.
     static bool parse(std::string filepath, RenderData &renderData);
+
+    static std::vector<RenderShapeData> dfs(SceneNode* root, glm::mat4 prev_transforms, std::vector<RenderShapeData> shapes = {});
+    static glm::mat4 make_matrix(std::vector<SceneTransformation*> transforms);
 };
 

@@ -7,8 +7,8 @@
 #include "settings.h"
 #include <GL/glew.h>
 
-#include "parser/scenedata.h"
-#include "parser/sceneparser.h"
+#include "utils/scenedata.h"
+#include "utils/sceneparser.h"
 
 // ================== Project 5: Lights, Camera
 
@@ -77,6 +77,26 @@ void Realtime::resizeGL(int w, int h) {
 void Realtime::sceneChanged() {
     RenderData metaData;
     bool success = SceneParser::parse(settings.sceneFilePath, metaData);
+
+    std::cout << "hello" << std::endl;
+
+    std::vector<RenderShapeData> shapes = metaData.shapes;
+
+    for (int i = 0; i < shapes.size(); i++) {
+        if (shapes[i].primitive.type == PrimitiveType::PRIMITIVE_CUBE) {
+            std::cout << "cube" << std::endl;
+        }
+        if (shapes[i].primitive.type == PrimitiveType::PRIMITIVE_CONE) {
+            std::cout << "cone" << std::endl;
+        }
+        if (shapes[i].primitive.type == PrimitiveType::PRIMITIVE_SPHERE) {
+            std::cout << "sphere" << std::endl;
+        }
+        if (shapes[i].primitive.type == PrimitiveType::PRIMITIVE_CYLINDER) {
+            std::cout << "cylinder" << std::endl;
+        }
+
+    }
 
     // loaded in the scene data
     // now need to render?
