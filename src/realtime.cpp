@@ -274,12 +274,43 @@ void Realtime::resizeGL(int w, int h) {
     // Students: anything requiring OpenGL calls when the program starts should be done here
 }
 
+void Realtime::generateMatrices(SceneCameraData& cameraData) {
+    Camera camera = Camera(cameraData, size().width(), size().height());
+
+    view = camera.getViewMatrix();
+    inverse_view = camera.getInverseViewMatrix();
+
+    float c = - settings.nearPlane / settings.farPlane;
+    glm::mat4 transformation = glm::mat4(1.f, 0.f,  0.f,  0.f,
+                                         0.f, 1.f,  0.f,  0.f,
+                                         0.f, 0.f, -2.f, -1.f,
+                                         0.f, 0.f,  0.f,  1.f);
+
+    glm::mat4 unhinging = glm::mat4(1.f, 0.f,       0.f,        0.f,
+                                    0.f, 1.f,       0.f,        0.f,
+                                    0.f, 0.f, 1/(1 + c), -c/(1 + c),
+                                    0.f, 0.f,      -1.f,       0.f);
+
+    float inv = 1.f / settings.farPlane;
+    float val2 = inv * tan(camera.getHeightAngle() /2);
+    float val1 = val2 * camera.getAspectRatio();
+
+    glm::mat4 scaling = glm::mat4(val1,  0.f,  0.f,  0.f,
+                                   0.f, val2,  0.f,  0.f,
+                                   0.f,  0.f,  inv,  0.f,
+                                   0.f,  0.f,  0.f,  1.f);
+
+    m_perspective = transformation * unhinging * scaling;
+}
+
 void Realtime::sceneChanged() {
 
     // loading in the scene data
     RenderData metaData;
     bool success = SceneParser::parse(settings.sceneFilePath, metaData);
     std::vector<RenderShapeData> shapes = metaData.shapes;
+
+    generateMatrices(metaData.cameraData);
 
     for (int i = 0; i < shapes.size(); i++) {
 
@@ -307,6 +338,13 @@ void Realtime::sceneChanged() {
 }
 
 void Realtime::settingsChanged() {
+
+    //    generateCubeVBOsVAOs();
+    //    generateSphereVBOsVAOs();
+    //    generateCylinderVBOsVAOs();
+    //    generateConeVBOsVAOs();
+
+    //    Debug::glErrorCheck();
 
     update(); // asks for a PaintGL() call to occur
 }

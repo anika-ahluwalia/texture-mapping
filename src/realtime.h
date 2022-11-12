@@ -13,6 +13,8 @@
 #include <QTime>
 #include <QTimer>
 
+#include "camera/camera.h"
+
 class Realtime : public QOpenGLWidget
 {
 public:
@@ -34,6 +36,8 @@ protected:
     void generateCylinderVBOsVAOs();
     void generateConeVBOsVAOs();
 
+    void generateMatrices(SceneCameraData& cameraData);
+
 private:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -53,6 +57,13 @@ private:
 
     // Device Correction Variables
     int m_devicePixelRatio;
+
+//    int m_width;
+//    int m_height;
+
+    glm::mat4 view;
+    glm::mat4 inverse_view;
+    glm::mat4 m_perspective;
 
     GLuint m_shader;       //Stores id for shader program
 
