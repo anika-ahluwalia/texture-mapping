@@ -29,6 +29,11 @@ protected:
     void paintGL() override;                            // Called whenever the OpenGL context changes or by an update() request
     void resizeGL(int width, int height) override;      // Called when window size changes
 
+    void generateCubeVBOsVAOs();
+    void generateSphereVBOsVAOs();
+    void generateCylinderVBOsVAOs();
+    void generateConeVBOsVAOs();
+
 private:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -48,4 +53,15 @@ private:
 
     // Device Correction Variables
     int m_devicePixelRatio;
+
+    GLuint m_shader;       //Stores id for shader program
+
+    GLuint cube_vbo;       //Stores id for cube vbo
+    GLuint cube_vao;       //Stores id for cube vao
+    GLuint sphere_vbo;     //Stores id for sphere vbo
+    GLuint sphere_vao;     //Stores id for sphere vao
+    GLuint cylinder_vbo;   //Stores id for cylinder vbo
+    GLuint cylinder_vao;   //Stores id for cylinder vao
+    GLuint cone_vbo;       //Stores id for cone vbo
+    GLuint cone_vao;       //Stores id for cone vao
 };
