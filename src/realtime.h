@@ -1,6 +1,7 @@
 #pragma once
 
 // Defined before including GLEW to suppress deprecation messages on macOS
+#include "glhelper.h"
 #ifdef __APPLE__
 #define GL_SILENCE_DEPRECATION
 #endif
@@ -31,11 +32,6 @@ protected:
     void paintGL() override;                            // Called whenever the OpenGL context changes or by an update() request
     void resizeGL(int width, int height) override;      // Called when window size changes
 
-    void generateCubeVBOsVAOs();
-    void generateSphereVBOsVAOs();
-    void generateCylinderVBOsVAOs();
-    void generateConeVBOsVAOs();
-
     void generateMatrices(SceneCameraData& cameraData);
 
 private:
@@ -61,18 +57,11 @@ private:
 //    int m_width;
 //    int m_height;
 
+    GLHelper gl;
+
     glm::mat4 view;
     glm::mat4 inverse_view;
     glm::mat4 m_perspective;
 
     GLuint m_shader;       //Stores id for shader program
-
-    GLuint cube_vbo;       //Stores id for cube vbo
-    GLuint cube_vao;       //Stores id for cube vao
-    GLuint sphere_vbo;     //Stores id for sphere vbo
-    GLuint sphere_vao;     //Stores id for sphere vao
-    GLuint cylinder_vbo;   //Stores id for cylinder vbo
-    GLuint cylinder_vao;   //Stores id for cylinder vao
-    GLuint cone_vbo;       //Stores id for cone vbo
-    GLuint cone_vao;       //Stores id for cone vao
 };
