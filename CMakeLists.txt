@@ -56,6 +56,9 @@ add_executable(${PROJECT_NAME}
     src/camera/camera.cpp
 
     src/shaderloader.h
+
+    src/glhelper.h
+    src/glhelper.cpp
 )
 
 # GLM: this creates its library and allows you to `#include "glm/..."`

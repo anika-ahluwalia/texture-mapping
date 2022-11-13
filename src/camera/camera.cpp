@@ -1,12 +1,15 @@
 #include <stdexcept>
 #include "camera.h"
 
-Camera::Camera(SceneCameraData& camera_data, int width, int height) {
+Camera::Camera(SceneCameraData& camera_data, int width, int height, float nearPlane, float farPlane) {
     cam_data = camera_data;
     s_width = width;
     s_height = height;
+    near_plane = nearPlane;
+    far_plane = farPlane;
     view_matrix = createViewMatrix();
     inverse_view_matrix = createInverseViewMatrix();
+    projection_matrix = createProjectionMatrix();
 }
 
 // only creating the camera view matrix once
@@ -37,12 +40,40 @@ glm::mat4 Camera::createInverseViewMatrix() {
     return inverse(view_matrix);
 }
 
+glm::mat4 Camera::createProjectionMatrix() {
+    float c = - near_plane / far_plane;
+    glm::mat4 transformation = glm::mat4(1.f, 0.f,  0.f,  0.f,
+                                         0.f, 1.f,  0.f,  0.f,
+                                         0.f, 0.f, -2.f, -1.f,
+                                         0.f, 0.f,  0.f,  1.f);
+
+    glm::mat4 unhinging = glm::mat4(1.f, 0.f,       0.f,        0.f,
+                                    0.f, 1.f,       0.f,        0.f,
+                                    0.f, 0.f, 1/(1 + c), -c/(1 + c),
+                                    0.f, 0.f,      -1.f,       0.f);
+
+    float inv = 1.f / far_plane;
+    float val2 = inv * tan(getHeightAngle() /2);
+    float val1 = val2 * getAspectRatio();
+
+    glm::mat4 scaling = glm::mat4(val1,  0.f,  0.f,  0.f,
+                                   0.f, val2,  0.f,  0.f,
+                                   0.f,  0.f,  inv,  0.f,
+                                   0.f,  0.f,  0.f,  1.f);
+
+    return transformation * unhinging * scaling;
+}
+
 glm::mat4 Camera::getViewMatrix() const {
     return view_matrix;
 }
 
 glm::mat4 Camera::getInverseViewMatrix() const {
     return inverse_view_matrix;
+}
+
+glm::mat4 Camera::getProjectionMatrix() const {
+    return projection_matrix;
 }
 
 float Camera::getAspectRatio() const {

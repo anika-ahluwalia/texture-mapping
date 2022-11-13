@@ -51,7 +51,7 @@ void Realtime::finish() {
     glDeleteBuffers(1, &cone_vbo);
     glDeleteVertexArrays(1, &cone_vao);
 
-    // glDeleteProgram(m_shader);
+    glDeleteProgram(m_shader);
 
     this->doneCurrent();
 }
@@ -82,16 +82,16 @@ void Realtime::initializeGL() {
 
     // clearing screen and loading shader
     glClearColor(0, 0, 0, 255);
-//    m_shader = ShaderLoader::createShaderProgram(":/Resources/Shaders/default.vert", ":/Resources/Shaders/default.frag");
-//    Debug::glErrorCheck();
+    m_shader = ShaderLoader::createShaderProgram(":/Resources/Shaders/default.vert", ":/Resources/Shaders/default.frag");
+    Debug::glErrorCheck();
 
-//    // load and bind VBOs and VAOs for each shape
-//    generateCubeVBOsVAOs();
-//    generateSphereVBOsVAOs();
-//    generateCylinderVBOsVAOs();
-//    generateConeVBOsVAOs();
+    // load and bind VBOs and VAOs for each shape
+    generateCubeVBOsVAOs();
+    generateSphereVBOsVAOs();
+    generateCylinderVBOsVAOs();
+    generateConeVBOsVAOs();
 
-//    Debug::glErrorCheck();
+    Debug::glErrorCheck();
 }
 
 void Realtime::generateCubeVBOsVAOs() {
@@ -110,8 +110,7 @@ void Realtime::generateCubeVBOsVAOs() {
     glGenVertexArrays(1, &cube_vao);
     glBindVertexArray(cube_vao);
 
-    // Task 13: Add position and color attributes to your VAO here
-    // position
+    // Add position and color attributes to VAO
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
@@ -120,7 +119,6 @@ void Realtime::generateCubeVBOsVAOs() {
     Debug::glErrorCheck();
 
     // Returning to Default State //
-    // unbinding
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
@@ -275,32 +273,11 @@ void Realtime::resizeGL(int w, int h) {
 }
 
 void Realtime::generateMatrices(SceneCameraData& cameraData) {
-    Camera camera = Camera(cameraData, size().width(), size().height());
+    Camera camera = Camera(cameraData, size().width(), size().height(), settings.nearPlane, settings.farPlane);
 
     view = camera.getViewMatrix();
     inverse_view = camera.getInverseViewMatrix();
-
-    float c = - settings.nearPlane / settings.farPlane;
-    glm::mat4 transformation = glm::mat4(1.f, 0.f,  0.f,  0.f,
-                                         0.f, 1.f,  0.f,  0.f,
-                                         0.f, 0.f, -2.f, -1.f,
-                                         0.f, 0.f,  0.f,  1.f);
-
-    glm::mat4 unhinging = glm::mat4(1.f, 0.f,       0.f,        0.f,
-                                    0.f, 1.f,       0.f,        0.f,
-                                    0.f, 0.f, 1/(1 + c), -c/(1 + c),
-                                    0.f, 0.f,      -1.f,       0.f);
-
-    float inv = 1.f / settings.farPlane;
-    float val2 = inv * tan(camera.getHeightAngle() /2);
-    float val1 = val2 * camera.getAspectRatio();
-
-    glm::mat4 scaling = glm::mat4(val1,  0.f,  0.f,  0.f,
-                                   0.f, val2,  0.f,  0.f,
-                                   0.f,  0.f,  inv,  0.f,
-                                   0.f,  0.f,  0.f,  1.f);
-
-    m_perspective = transformation * unhinging * scaling;
+    m_perspective = camera.getProjectionMatrix();
 }
 
 void Realtime::sceneChanged() {
@@ -339,12 +316,12 @@ void Realtime::sceneChanged() {
 
 void Realtime::settingsChanged() {
 
-    //    generateCubeVBOsVAOs();
-    //    generateSphereVBOsVAOs();
-    //    generateCylinderVBOsVAOs();
-    //    generateConeVBOsVAOs();
+    generateCubeVBOsVAOs();
+    generateSphereVBOsVAOs();
+    generateCylinderVBOsVAOs();
+    generateConeVBOsVAOs();
 
-    //    Debug::glErrorCheck();
+    Debug::glErrorCheck();
 
     update(); // asks for a PaintGL() call to occur
 }
