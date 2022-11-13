@@ -15,7 +15,8 @@
 // ================== Project 5: Lights, Camera
 
 Realtime::Realtime(QWidget *parent)
-    : QOpenGLWidget(parent)
+    : QOpenGLWidget(parent),
+      gl({ settings.shapeParameter1, settings.shapeParameter2 })
 {
     m_prev_mouse_pos = glm::vec2(size().width()/2, size().height()/2);
     setMouseTracking(true);
@@ -27,8 +28,6 @@ Realtime::Realtime(QWidget *parent)
     m_keyMap[Qt::Key_D]       = false;
     m_keyMap[Qt::Key_Control] = false;
     m_keyMap[Qt::Key_Space]   = false;
-
-    gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
 
     // If you must use this function, do not edit anything above this
 }
