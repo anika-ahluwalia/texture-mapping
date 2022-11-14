@@ -6,6 +6,8 @@
 #include "shapes/cylinder.h"
 #include "shapes/cone.h"
 
+#include <GL/glew.h>
+
 GLHelper::GLHelper(int param1, int param2)
 {
     m_param1 = param1;
@@ -41,7 +43,7 @@ void GLHelper::generateCubeVBOsVAOs() {
     cube_data = cube.generateShape();
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * cube_data.size(), &cube_data[0], GL_STATIC_DRAW);
 
-    Debug::glErrorCheck();
+    // Debug::glErrorCheck();
 
     // Vertex Array Objects //
     glGenVertexArrays(1, &cube_vao);
@@ -53,13 +55,13 @@ void GLHelper::generateCubeVBOsVAOs() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, reinterpret_cast<void*>(3 * sizeof(GL_FLOAT)));
 
-    Debug::glErrorCheck();
+    // Debug::glErrorCheck();
 
     // Returning to Default State //
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    Debug::glErrorCheck();
+    // Debug::glErrorCheck();
 }
 
 void GLHelper::generateSphereVBOsVAOs() {
@@ -72,7 +74,7 @@ void GLHelper::generateSphereVBOsVAOs() {
     sphere_data = sphere.generateShape();
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sphere_data.size(), &sphere_data[0], GL_STATIC_DRAW);
 
-    Debug::glErrorCheck();
+    // Debug::glErrorCheck();
 
     // Vertex Array Objects //
     glGenVertexArrays(1, &sphere_vao);
@@ -85,14 +87,14 @@ void GLHelper::generateSphereVBOsVAOs() {
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, reinterpret_cast<void*>(3 * sizeof(GL_FLOAT)));
 
-    Debug::glErrorCheck();
+    // Debug::glErrorCheck();
 
     // Returning to Default State //
     // unbinding
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    Debug::glErrorCheck();
+    // Debug::glErrorCheck();
 }
 
 void GLHelper::generateCylinderVBOsVAOs() {

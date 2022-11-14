@@ -20,7 +20,7 @@ void main() {
     fragColor = ambient;
 
     for (int i = 0; i < 8; ++i) {
-        vec3 lighting = normalize(-lightDirections[i])
+        vec3 lighting = normalize(-lightDirections[i]);
         float diffuse_dot_product = max(min(dot(worldSpaceNormal, lighting), 1), 0);
         vec4 diffuse = lightColors[i] * diffuseCoefficients * diffuse_dot_product;
         fragColor = fragColor + diffuse;

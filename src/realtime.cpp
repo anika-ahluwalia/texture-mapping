@@ -75,7 +75,6 @@ void Realtime::initializeGL() {
 
     // load and bind VBOs and VAOs for each shape
     gl.generateAllShapes();
-    generateMatrices(metadata.cameraData);
 
     Debug::glErrorCheck();
 }
@@ -188,7 +187,6 @@ void Realtime::sceneChanged() {
 
 void Realtime::settingsChanged() {
 
-    gl.cleanMemory();
     gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
     gl.generateAllShapes();
 

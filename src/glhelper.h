@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef GLHELPER_H
 #define GLHELPER_H
 
