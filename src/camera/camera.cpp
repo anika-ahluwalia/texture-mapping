@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "camera.h"
+#include "glm/ext/matrix_clip_space.hpp"
 
 Camera::Camera(SceneCameraData& camera_data, int width, int height, float nearPlane, float farPlane) {
     cam_data = camera_data;
@@ -73,7 +74,7 @@ glm::mat4 Camera::getInverseViewMatrix() const {
 }
 
 glm::mat4 Camera::getProjectionMatrix() const {
-    return projection_matrix;
+    return glm::perspective(getHeightAngle(), getAspectRatio(), near_plane, far_plane);
 }
 
 float Camera::getAspectRatio() const {

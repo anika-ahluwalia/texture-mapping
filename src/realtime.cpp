@@ -74,6 +74,7 @@ void Realtime::initializeGL() {
     Debug::glErrorCheck();
 
     // load and bind VBOs and VAOs for each shape
+    gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
     gl.generateAllShapes();
 
     Debug::glErrorCheck();
@@ -90,6 +91,7 @@ void Realtime::paintGL() {
     std::vector<float> shape_data;
 
     for (int i = 0; i < shapes.size(); i++) {
+
         switch (shapes[i].primitive.type) {
             case PrimitiveType::PRIMITIVE_CUBE: {
                 vao = gl.cube_vao;
@@ -117,12 +119,14 @@ void Realtime::paintGL() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
 
+        Debug::glErrorCheck();
+
         // Activate the shader program by calling glUseProgram with `m_shader`
         glUseProgram(m_shader);
 
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
-        // Pass in m_model as a uniform into the shader program
+
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[i].ctm[0][0]);
 
         glUniform1f(glGetUniformLocation(m_shader, "ka"), metadata.globalData.ka);
@@ -137,9 +141,12 @@ void Realtime::paintGL() {
         glm::vec4 camera_pos = glm::inverse(m_view) * origin;
         glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
 
+         Debug::glErrorCheck();
+
         glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[i].primitive.material.shininess);
 
         for (int i = 0; i < metadata.lights.size(); i++) {
+
             SceneLightData light = metadata.lights[i];
 
             std::string dir_pos = "lightDirections[" + std::to_string(i) + "]";
@@ -151,11 +158,15 @@ void Realtime::paintGL() {
             glUniform4f(color_loc, light.color[0], light.color[1], light.color[2], light.color[3]);
         }
 
+         Debug::glErrorCheck();
+
 
         // Draw Command
         glDrawArrays(GL_TRIANGLES, 0, shape_data.size() / 3);
         // Unbind Vertex Array
         glBindVertexArray(0);
+
+         Debug::glErrorCheck();
 
         // Deactivate the shader program
         glUseProgram(0);
