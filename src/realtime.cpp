@@ -37,8 +37,8 @@ void Realtime::finish() {
     this->makeCurrent();
 
     // Students: anything requiring OpenGL calls when the program exits should be done here
-    gl.cleanMemory();
 
+    gl.cleanMemory();
     glDeleteProgram(m_shader);
 
     this->doneCurrent();
@@ -81,6 +81,30 @@ void Realtime::initializeGL() {
 
 void Realtime::paintGL() {
     // Students: anything requiring OpenGL calls every frame should be done here
+
+    std::vector<RenderShapeData> shapes = metadata.shapes;
+
+    for (int i = 0; i < shapes.size(); i++) {
+
+        switch (shapes[i].primitive.type) {
+            case PrimitiveType::PRIMITIVE_CUBE: {
+                std::cout << "cube" << std::endl;
+                break;
+            }
+            case PrimitiveType::PRIMITIVE_CONE: {
+                std::cout << "cube" << std::endl;
+                break;
+            }
+            case PrimitiveType::PRIMITIVE_SPHERE: {
+                std::cout << "cube" << std::endl;
+                break;
+            }
+            case PrimitiveType::PRIMITIVE_CYLINDER: {
+                std::cout << "cube" << std::endl;
+                break;
+            }
+        }
+    }
 
 //    // Clear screen color and depth before painting
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -126,6 +150,7 @@ void Realtime::resizeGL(int w, int h) {
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
+    generateMatrices(metadata.cameraData);
 }
 
 void Realtime::generateMatrices(SceneCameraData& cameraData) {
@@ -139,33 +164,8 @@ void Realtime::generateMatrices(SceneCameraData& cameraData) {
 void Realtime::sceneChanged() {
 
     // loading in the scene data
-    RenderData metaData;
-    bool success = SceneParser::parse(settings.sceneFilePath, metaData);
-    std::vector<RenderShapeData> shapes = metaData.shapes;
-
-    generateMatrices(metaData.cameraData);
-
-    for (int i = 0; i < shapes.size(); i++) {
-
-        switch (shapes[i].primitive.type) {
-            case PrimitiveType::PRIMITIVE_CUBE: {
-                std::cout << "cube" << std::endl;
-                break;
-            }
-            case PrimitiveType::PRIMITIVE_CONE: {
-                std::cout << "cube" << std::endl;
-                break;
-            }
-            case PrimitiveType::PRIMITIVE_SPHERE: {
-                std::cout << "cube" << std::endl;
-                break;
-            }
-            case PrimitiveType::PRIMITIVE_CYLINDER: {
-                std::cout << "cube" << std::endl;
-                break;
-            }
-        }
-    }
+    bool success = SceneParser::parse(settings.sceneFilePath, metadata);
+    generateMatrices(metadata.cameraData);
 
     update(); // asks for a PaintGL() call to occur
 }
