@@ -54,8 +54,7 @@ private:
     // Device Correction Variables
     int m_devicePixelRatio;
 
-//    int m_width;
-//    int m_height;
+
 
     GLHelper gl;
 

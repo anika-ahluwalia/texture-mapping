@@ -75,6 +75,7 @@ void Realtime::initializeGL() {
 
     // load and bind VBOs and VAOs for each shape
     gl.generateAllShapes();
+    generateMatrices(metadata.cameraData);
 
     Debug::glErrorCheck();
 }
@@ -115,37 +116,47 @@ void Realtime::paintGL() {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
 
-        // Task 2: activate the shader program by calling glUseProgram with `m_shader`
+        // Activate the shader program by calling glUseProgram with `m_shader`
         glUseProgram(m_shader);
 
-        // Task 6: pass in m_model as a uniform into the shader program
-        glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[i].ctm[0][0]);
-
-        // Task 7: pass in m_view and m_proj
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
+        // Pass in m_model as a uniform into the shader program
+        glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[i].ctm[0][0]);
 
-        // Task 12: pass m_ka into the fragment shader as a uniform
         glUniform1f(glGetUniformLocation(m_shader, "ka"), metadata.globalData.ka);
-
-        // Task 13: pass light position and m_kd into the fragment shader as a uniform
         glUniform1f(glGetUniformLocation(m_shader, "kd"), metadata.globalData.kd);
-        glUniform4fv(glGetUniformLocation(m_shader, "lightPos"), 1, &metadata.lights[0].pos[0]);
-
-        // Task 14: pass shininess, m_ks, and world-space camera position
         glUniform1f(glGetUniformLocation(m_shader, "ks"), metadata.globalData.ks);
-        glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[i].primitive.material.shininess);
+
+        glUniform4fv(glGetUniformLocation(m_shader, "cAmbient"), 1, &shapes[i].primitive.material.cAmbient[0]);
+        glUniform4fv(glGetUniformLocation(m_shader, "cDiffuse"), 1, &shapes[i].primitive.material.cDiffuse[0]);
+        glUniform4fv(glGetUniformLocation(m_shader, "cSpecular"), 1, &shapes[i].primitive.material.cSpecular[0]);
 
         glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
         glm::vec4 camera_pos = glm::inverse(m_view) * origin;
         glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
+
+        glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[i].primitive.material.shininess);
+
+        for (int i = 0; i < metadata.lights.size(); i++) {
+            SceneLightData light = metadata.lights[i];
+
+            std::string dir_pos = "lightDirections[" + std::to_string(i) + "]";
+            GLint dir_loc = glGetUniformLocation(m_shader, dir_pos.c_str());
+            glUniform3f(dir_loc, light.dir[0], light.dir[1], light.dir[2]);
+
+             std::string color_pos = "lightColors[" + std::to_string(i) + "]";
+            GLint color_loc = glGetUniformLocation(m_shader, color_pos.c_str());
+            glUniform4f(color_loc, light.color[0], light.color[1], light.color[2], light.color[3]);
+        }
+
 
         // Draw Command
         glDrawArrays(GL_TRIANGLES, 0, shape_data.size() / 3);
         // Unbind Vertex Array
         glBindVertexArray(0);
 
-        // Task 3: deactivate the shader program by passing 0 into glUseProgram
+        // Deactivate the shader program
         glUseProgram(0);
     }
 }
