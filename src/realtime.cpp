@@ -70,13 +70,15 @@ void Realtime::initializeGL() {
 
     // clearing screen and loading shader
     glClearColor(0, 0, 0, 255);
-    m_shader = ShaderLoader::createShaderProgram(":/Resources/Shaders/default.vert", ":/Resources/Shaders/default.frag");
+    m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
     Debug::glErrorCheck();
 
     // load and bind VBOs and VAOs for each shape
     gl.generateAllShapes();
 
     Debug::glErrorCheck();
+
+    is_intialized = true;
 }
 
 void Realtime::paintGL() {
@@ -187,12 +189,14 @@ void Realtime::sceneChanged() {
 
 void Realtime::settingsChanged() {
 
-    gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
-    gl.generateAllShapes();
+    if (is_intialized) {
+        gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
+        gl.generateAllShapes();
 
-    Debug::glErrorCheck();
+        Debug::glErrorCheck();
 
-    update(); // asks for a PaintGL() call to occur
+        update(); // asks for a PaintGL() call to occur
+    }
 }
 
 // ================== Project 6: Action!

@@ -28,8 +28,8 @@ void main() {
         vec3 reflection = reflect(-lighting, worldSpaceNormal);
         vec3 dirToCamera = normalize(vec3(worldSpaceCameraPos) - worldSpacePos);
         // check 0 cases
-        float shine = max(glm::dot(reflection, dirToCamera), 0);
+        float shine = max(dot(reflection, dirToCamera), 0);
         vec4 specular = lightColors[i] * specularCoefficients * pow(shine, shininess);
-        fragColor = fragColor + specular
+        fragColor = fragColor + specular;
     }
 }

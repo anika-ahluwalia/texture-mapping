@@ -58,6 +58,8 @@ private:
 
     GLHelper gl;
 
+    bool is_intialized = false;
+
     RenderData metadata;
 
     glm::mat4 m_view;
