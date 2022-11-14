@@ -9,7 +9,7 @@
 
 #include "utils/scenedata.h"
 #include "utils/sceneparser.h"
-#include "shaderloader.h"
+#include "utils/shaderloader.h"
 #include "debug.h"
 
 // ================== Project 5: Lights, Camera
@@ -84,65 +84,70 @@ void Realtime::paintGL() {
 
     std::vector<RenderShapeData> shapes = metadata.shapes;
 
-    for (int i = 0; i < shapes.size(); i++) {
+    GLuint vao;
+    std::vector<float> shape_data;
 
+    for (int i = 0; i < shapes.size(); i++) {
         switch (shapes[i].primitive.type) {
             case PrimitiveType::PRIMITIVE_CUBE: {
-                std::cout << "cube" << std::endl;
+                vao = gl.cube_vao;
+                shape_data = gl.cube_data;
                 break;
             }
             case PrimitiveType::PRIMITIVE_CONE: {
-                std::cout << "cube" << std::endl;
+                vao = gl.cone_vao;
+                shape_data = gl.cone_data;
                 break;
             }
             case PrimitiveType::PRIMITIVE_SPHERE: {
-                std::cout << "cube" << std::endl;
+                vao = gl.sphere_vao;
+                shape_data = gl.sphere_data;
                 break;
             }
             case PrimitiveType::PRIMITIVE_CYLINDER: {
-                std::cout << "cube" << std::endl;
+                vao = gl.cylinder_vao;
+                shape_data = gl.cylinder_data;
                 break;
             }
         }
+
+        // Clear screen color and depth before painting
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glBindVertexArray(vao);
+
+        // Task 2: activate the shader program by calling glUseProgram with `m_shader`
+        glUseProgram(m_shader);
+
+        // Task 6: pass in m_model as a uniform into the shader program
+        glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[i].ctm[0][0]);
+
+        // Task 7: pass in m_view and m_proj
+        glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
+
+        // Task 12: pass m_ka into the fragment shader as a uniform
+        glUniform1f(glGetUniformLocation(m_shader, "ka"), metadata.globalData.ka);
+
+        // Task 13: pass light position and m_kd into the fragment shader as a uniform
+        glUniform1f(glGetUniformLocation(m_shader, "kd"), metadata.globalData.kd);
+        glUniform4fv(glGetUniformLocation(m_shader, "lightPos"), 1, &metadata.lights[0].pos[0]);
+
+        // Task 14: pass shininess, m_ks, and world-space camera position
+        glUniform1f(glGetUniformLocation(m_shader, "ks"), metadata.globalData.ks);
+        glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[i].primitive.material.shininess);
+
+        glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
+        glm::vec4 camera_pos = glm::inverse(m_view) * origin;
+        glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
+
+        // Draw Command
+        glDrawArrays(GL_TRIANGLES, 0, shape_data.size() / 3);
+        // Unbind Vertex Array
+        glBindVertexArray(0);
+
+        // Task 3: deactivate the shader program by passing 0 into glUseProgram
+        glUseProgram(0);
     }
-
-//    // Clear screen color and depth before painting
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    // Bind Sphere Vertex Data
-//    glBindVertexArray(m_sphere_vao);
-
-//    // Task 2: activate the shader program by calling glUseProgram with `m_shader`
-//    glUseProgram(m_shader);
-
-//    // Task 6: pass in m_model as a uniform into the shader program
-//    glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &m_model[0][0]);
-
-//    // Task 7: pass in m_view and m_proj
-//    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
-//    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_proj[0][0]);
-
-//    // Task 12: pass m_ka into the fragment shader as a uniform
-//    glUniform1f(glGetUniformLocation(m_shader, "ka"), m_ka);
-
-//    // Task 13: pass light position and m_kd into the fragment shader as a uniform
-//    glUniform1f(glGetUniformLocaon(m_shader, "kd"), m_kd);
-//    glUniform4fv(glGetUniformLocation(m_shader, "lightPos"), 1, &m_lightPos[0]);
-
-//    // Task 14: pass shininess, m_ks, and world-space camera position
-//    glUniform1f(glGetUniformLocation(m_shader, "ks"), m_ks);
-//    glUniform1f(glGetUniformLocation(m_shader, "shininess"), m_shininess);
-
-//    glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
-//    glm::vec4 camera_pos = glm::inverse(m_view) * origin;
-//    glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
-
-//    // Draw Command
-//    glDrawArrays(GL_TRIANGLES, 0, m_sphereData.size() / 3);
-//    // Unbind Vertex Array
-//    glBindVertexArray(0);
-
-//    // Task 3: deactivate the shader program by passing 0 into glUseProgram
-//    glUseProgram(0);
 }
 
 void Realtime::resizeGL(int w, int h) {
@@ -156,9 +161,9 @@ void Realtime::resizeGL(int w, int h) {
 void Realtime::generateMatrices(SceneCameraData& cameraData) {
     Camera camera = Camera(cameraData, size().width(), size().height(), settings.nearPlane, settings.farPlane);
 
-    view = camera.getViewMatrix();
-    inverse_view = camera.getInverseViewMatrix();
-    m_perspective = camera.getProjectionMatrix();
+    m_view = camera.getViewMatrix();
+    m_inverse_view = camera.getInverseViewMatrix();
+    m_projection = camera.getProjectionMatrix();
 }
 
 void Realtime::sceneChanged() {

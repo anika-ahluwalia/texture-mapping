@@ -24,6 +24,7 @@ void GLHelper::cleanMemory() {
 }
 
 void GLHelper::generateAllShapes() {
+    // use polymorphism to simplify these
     generateCubeVBOsVAOs();
     generateConeVBOsVAOs();
     generateCylinderVBOsVAOs();
@@ -37,8 +38,8 @@ void GLHelper::generateCubeVBOsVAOs() {
     glBindBuffer(GL_ARRAY_BUFFER, cube_vbo);
     Cube cube = Cube();
     cube.updateParams(m_param1);
-    std::vector<float> cube_vec = cube.generateShape();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * cube_vec.size(), &cube_vec[0], GL_STATIC_DRAW);
+    cube_data = cube.generateShape();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * cube_data.size(), &cube_data[0], GL_STATIC_DRAW);
 
     Debug::glErrorCheck();
 
@@ -68,8 +69,8 @@ void GLHelper::generateSphereVBOsVAOs() {
     glBindBuffer(GL_ARRAY_BUFFER, sphere_vbo);
     Sphere sphere = Sphere();
     sphere.updateParams(m_param1, m_param2);
-    std::vector<float> sphere_vec = sphere.generateShape();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sphere_vec.size(), &sphere_vec[0], GL_STATIC_DRAW);
+    sphere_data = sphere.generateShape();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sphere_data.size(), &sphere_data[0], GL_STATIC_DRAW);
 
     Debug::glErrorCheck();
 
@@ -101,8 +102,8 @@ void GLHelper::generateCylinderVBOsVAOs() {
     glBindBuffer(GL_ARRAY_BUFFER, cylinder_vbo);
     Cylinder cylinder = Cylinder();
     cylinder.updateParams(m_param1, m_param2);
-    std::vector<float> cylinder_vec = cylinder.generateShape();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * cylinder_vec.size(), &cylinder_vec[0], GL_STATIC_DRAW);
+    cylinder_data = cylinder.generateShape();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * cylinder_data.size(), &cylinder_data[0], GL_STATIC_DRAW);
 
     Debug::glErrorCheck();
 
@@ -134,8 +135,8 @@ void GLHelper::generateConeVBOsVAOs() {
     glBindBuffer(GL_ARRAY_BUFFER, cone_vbo);
     Cone cone = Cone();
     cone.updateParams(m_param1, m_param2);
-    std::vector<float> cone_vec = cone.generateShape();
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * cone_vec.size(), &cone_vec[0], GL_STATIC_DRAW);
+    cone_data = cone.generateShape();
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * cone_data.size(), &cone_data[0], GL_STATIC_DRAW);
 
     Debug::glErrorCheck();
 

@@ -61,9 +61,9 @@ private:
 
     RenderData metadata;
 
-    glm::mat4 view;
-    glm::mat4 inverse_view;
-    glm::mat4 m_perspective;
+    glm::mat4 m_view;
+    glm::mat4 m_inverse_view;
+    glm::mat4 m_projection;
 
     GLuint m_shader;       //Stores id for shader program
 };

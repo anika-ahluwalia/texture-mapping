@@ -55,8 +55,6 @@ add_executable(${PROJECT_NAME}
     src/camera/camera.h
     src/camera/camera.cpp
 
-    src/shaderloader.h
-
     src/glhelper.h
     src/glhelper.cpp
 )
