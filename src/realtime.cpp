@@ -90,11 +90,8 @@ void Realtime::paintGL() {
     GLuint vao;
     std::vector<float> shape_data;
 
-    for (int i = 0; i < shapes.size(); i++) {
-
-        std::cout << "shape" << std::endl;
-
-        switch (shapes[i].primitive.type) {
+    for (int index = 0; index < shapes.size(); index++) {
+        switch (shapes[index].primitive.type) {
             case PrimitiveType::PRIMITIVE_CUBE: {
                 vao = gl.cube_vao;
                 shape_data = gl.cube_data;
@@ -133,15 +130,15 @@ void Realtime::paintGL() {
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
 
-        glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[i].ctm[0][0]);
+        glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[index].ctm[0][0]);
 
         glUniform1f(glGetUniformLocation(m_shader, "ka"), metadata.globalData.ka);
         glUniform1f(glGetUniformLocation(m_shader, "kd"), metadata.globalData.kd);
         glUniform1f(glGetUniformLocation(m_shader, "ks"), metadata.globalData.ks);
 
-        glUniform4fv(glGetUniformLocation(m_shader, "cAmbient"), 1, &shapes[i].primitive.material.cAmbient[0]);
-        glUniform4fv(glGetUniformLocation(m_shader, "cDiffuse"), 1, &shapes[i].primitive.material.cDiffuse[0]);
-        glUniform4fv(glGetUniformLocation(m_shader, "cSpecular"), 1, &shapes[i].primitive.material.cSpecular[0]);
+        glUniform4fv(glGetUniformLocation(m_shader, "cAmbient"), 1, &shapes[index].primitive.material.cAmbient[0]);
+        glUniform4fv(glGetUniformLocation(m_shader, "cDiffuse"), 1, &shapes[index].primitive.material.cDiffuse[0]);
+        glUniform4fv(glGetUniformLocation(m_shader, "cSpecular"), 1, &shapes[index].primitive.material.cSpecular[0]);
 
         glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
         glm::vec4 camera_pos = glm::inverse(m_view) * origin;
@@ -149,17 +146,17 @@ void Realtime::paintGL() {
 
          Debug::glErrorCheck();
 
-        glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[i].primitive.material.shininess);
+        glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[index].primitive.material.shininess);
 
-        for (int i = 0; i < metadata.lights.size(); i++) {
+        for (int j = 0; j < metadata.lights.size(); j++) {
 
-            SceneLightData light = metadata.lights[i];
+            SceneLightData light = metadata.lights[j];
 
-            std::string dir_pos = "lightDirections[" + std::to_string(i) + "]";
+            std::string dir_pos = "lightDirections[" + std::to_string(j) + "]";
             GLint dir_loc = glGetUniformLocation(m_shader, dir_pos.c_str());
             glUniform3f(dir_loc, light.dir[0], light.dir[1], light.dir[2]);
 
-             std::string color_pos = "lightColors[" + std::to_string(i) + "]";
+             std::string color_pos = "lightColors[" + std::to_string(j) + "]";
             GLint color_loc = glGetUniformLocation(m_shader, color_pos.c_str());
             glUniform4f(color_loc, light.color[0], light.color[1], light.color[2], light.color[3]);
         }
