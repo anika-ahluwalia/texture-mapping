@@ -43,24 +43,26 @@ glm::mat4 Camera::createInverseViewMatrix() {
 
 glm::mat4 Camera::createProjectionMatrix() {
     float c = -1.f * near_plane / far_plane;
+
     glm::mat4 transformation = glm::mat4(1.f, 0.f,  0.f,  0.f,
                                          0.f, 1.f,  0.f,  0.f,
-                                         0.f, 0.f, -2.f, -1.f,
-                                         0.f, 0.f,  0.f,  1.f);
+                                         0.f, 0.f, -2.f,  0.f,
+                                         0.f, 0.f, -1.f,  1.f);
 
-    glm::mat4 unhinging = glm::mat4(1.f, 0.f,       0.f,        0.f,
-                                    0.f, 1.f,       0.f,        0.f,
-                                    0.f, 0.f, 1/(1 + c), -c/(1 + c),
-                                    0.f, 0.f,      -1.f,       0.f);
+    glm::mat4 unhinging = glm::mat4(1.f, 0.f,       0.f,       0.f,
+                                    0.f, 1.f,       0.f,       0.f,
+                                    0.f, 0.f, 1.f/(1.f + c),  -1.f,
+                                    0.f, 0.f,  -c/(1.f + c),   0.f);
 
-    float inv = 1.f / far_plane;
-    float val2 = inv * tan(getHeightAngle() /2);
-    float val1 = val2 * getAspectRatio();
+    float widthAngle = getHeightAngle() * getAspectRatio();
+    float val1 = 1.f / (far_plane * glm::tan(widthAngle / 2.f));
+    float val2 = 1.f / (far_plane * glm::tan(getHeightAngle() / 2.f));
+    float val3 = 1.f / far_plane;
 
-    glm::mat4 scaling = glm::mat4(val1,  0.f,  0.f,  0.f,
-                                   0.f, val2,  0.f,  0.f,
-                                   0.f,  0.f,  inv,  0.f,
-                                   0.f,  0.f,  0.f,  1.f);
+    glm::mat4 scaling = glm::mat4(val1,  0.f,   0.f,  0.f,
+                                   0.f, val2,   0.f,  0.f,
+                                   0.f,  0.f,  val3,  0.f,
+                                   0.f,  0.f,   0.f,  1.f);
 
     return transformation * unhinging * scaling;
 }
@@ -74,8 +76,7 @@ glm::mat4 Camera::getInverseViewMatrix() const {
 }
 
 glm::mat4 Camera::getProjectionMatrix() const {
-    return glm::perspective(getHeightAngle(), getAspectRatio(), near_plane, far_plane);
-    // return projection_matrix;
+    return projection_matrix;
 }
 
 float Camera::getAspectRatio() const {

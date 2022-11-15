@@ -125,8 +125,10 @@ void Realtime::paintGL() {
         // Activate the shader program by calling glUseProgram with `m_shader`
         glUseProgram(m_shader);
 
-        glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
-        glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
+//        glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
+//        glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
+
+
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[index].ctm[0][0]);
 
         glUniform1f(glGetUniformLocation(m_shader, "ka"), metadata.globalData.ka);
@@ -195,10 +197,11 @@ void Realtime::generateMatrices(SceneCameraData& cameraData) {
     m_inverse_view = camera.getInverseViewMatrix();
     m_projection = camera.getProjectionMatrix();
 
-//    this->makeCurrent();
+    this->makeCurrent();
+    glUseProgram(m_shader);
 
-//    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
-//    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
 
 //    Debug::glErrorCheck();
 
@@ -209,7 +212,9 @@ void Realtime::generateMatrices(SceneCameraData& cameraData) {
 
 //    Debug::glErrorCheck();
 
-//    this->doneCurrent();
+    glUseProgram(0);
+
+    this->doneCurrent();
 }
 
 void Realtime::sceneChanged() {
@@ -237,12 +242,9 @@ void Realtime::settingsChanged() {
         generateMatrices(metadata.cameraData);
 
         this->makeCurrent();
-
         gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
         gl.generateAllShapes();
-
         Debug::glErrorCheck();
-
         this->doneCurrent();
 
         update(); // asks for a PaintGL() call to occur
