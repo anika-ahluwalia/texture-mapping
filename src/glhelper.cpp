@@ -70,7 +70,7 @@ void GLHelper::generateSphereVBOsVAOs() {
     glGenBuffers(1, &sphere_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, sphere_vbo);
     Sphere sphere = Sphere();
-    sphere.updateParams(m_param1, m_param2);
+    sphere.updateParams(std::max(m_param1, 2), std::max(m_param2, 3));
     sphere_data = sphere.generateShape();
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * sphere_data.size(), &sphere_data[0], GL_STATIC_DRAW);
 
@@ -103,7 +103,7 @@ void GLHelper::generateCylinderVBOsVAOs() {
     glGenBuffers(1, &cylinder_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, cylinder_vbo);
     Cylinder cylinder = Cylinder();
-    cylinder.updateParams(m_param1, m_param2);
+    cylinder.updateParams(m_param1, std::max(m_param2, 3));
     cylinder_data = cylinder.generateShape();
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * cylinder_data.size(), &cylinder_data[0], GL_STATIC_DRAW);
 
@@ -136,7 +136,7 @@ void GLHelper::generateConeVBOsVAOs() {
     glGenBuffers(1, &cone_vbo);
     glBindBuffer(GL_ARRAY_BUFFER, cone_vbo);
     Cone cone = Cone();
-    cone.updateParams(m_param1, m_param2);
+    cone.updateParams(m_param1, std::max(m_param2, 3));
     cone_data = cone.generateShape();
     glBufferData(GL_ARRAY_BUFFER, sizeof(float) * cone_data.size(), &cone_data[0], GL_STATIC_DRAW);
 
