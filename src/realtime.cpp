@@ -92,25 +92,31 @@ void Realtime::paintGL() {
 
     for (int i = 0; i < shapes.size(); i++) {
 
+        std::cout << "shape" << std::endl;
+
         switch (shapes[i].primitive.type) {
             case PrimitiveType::PRIMITIVE_CUBE: {
                 vao = gl.cube_vao;
                 shape_data = gl.cube_data;
+                std::cout << "cube" << std::endl;
                 break;
             }
             case PrimitiveType::PRIMITIVE_CONE: {
                 vao = gl.cone_vao;
                 shape_data = gl.cone_data;
+                std::cout << "cone" << std::endl;
                 break;
             }
             case PrimitiveType::PRIMITIVE_SPHERE: {
                 vao = gl.sphere_vao;
                 shape_data = gl.sphere_data;
+                std::cout << "sphere" << std::endl;
                 break;
             }
             case PrimitiveType::PRIMITIVE_CYLINDER: {
                 vao = gl.cylinder_vao;
                 shape_data = gl.cylinder_data;
+                std::cout << "cylinder" << std::endl;
                 break;
             }
         }
