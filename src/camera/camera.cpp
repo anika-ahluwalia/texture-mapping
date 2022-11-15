@@ -42,7 +42,7 @@ glm::mat4 Camera::createInverseViewMatrix() {
 }
 
 glm::mat4 Camera::createProjectionMatrix() {
-    float c = - near_plane / far_plane;
+    float c = -1.f * near_plane / far_plane;
     glm::mat4 transformation = glm::mat4(1.f, 0.f,  0.f,  0.f,
                                          0.f, 1.f,  0.f,  0.f,
                                          0.f, 0.f, -2.f, -1.f,
@@ -75,6 +75,7 @@ glm::mat4 Camera::getInverseViewMatrix() const {
 
 glm::mat4 Camera::getProjectionMatrix() const {
     return glm::perspective(getHeightAngle(), getAspectRatio(), near_plane, far_plane);
+    // return projection_matrix;
 }
 
 float Camera::getAspectRatio() const {

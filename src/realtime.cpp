@@ -88,6 +88,9 @@ void Realtime::paintGL() {
 
     std::vector<RenderShapeData> shapes = metadata.shapes;
 
+    // Clear screen color and depth before painting
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     GLuint vao;
     std::vector<float> shape_data;
 
@@ -96,31 +99,25 @@ void Realtime::paintGL() {
             case PrimitiveType::PRIMITIVE_CUBE: {
                 vao = gl.cube_vao;
                 shape_data = gl.cube_data;
-                std::cout << "cube" << std::endl;
                 break;
             }
             case PrimitiveType::PRIMITIVE_CONE: {
                 vao = gl.cone_vao;
                 shape_data = gl.cone_data;
-                std::cout << "cone" << std::endl;
                 break;
             }
             case PrimitiveType::PRIMITIVE_SPHERE: {
                 vao = gl.sphere_vao;
                 shape_data = gl.sphere_data;
-                std::cout << "sphere" << std::endl;
                 break;
             }
             case PrimitiveType::PRIMITIVE_CYLINDER: {
                 vao = gl.cylinder_vao;
                 shape_data = gl.cylinder_data;
-                std::cout << "cylinder" << std::endl;
                 break;
             }
         }
 
-        // Clear screen color and depth before painting
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glBindVertexArray(vao);
 
         Debug::glErrorCheck();
@@ -144,7 +141,6 @@ void Realtime::paintGL() {
         glm::vec4 camera_pos = glm::inverse(m_view) * origin;
         glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
 
-         Debug::glErrorCheck();
 
         glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[index].primitive.material.shininess);
 
@@ -198,16 +194,58 @@ void Realtime::generateMatrices(SceneCameraData& cameraData) {
     m_inverse_view = camera.getInverseViewMatrix();
     m_projection = camera.getProjectionMatrix();
 
+//    this->makeCurrent();
+
 //    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
 //    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
+
+//    glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
+//    glm::vec4 camera_pos = glm::inverse(m_view) * origin;
+//    glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
+
+//    this->doneCurrent();
 }
 
 void Realtime::sceneChanged() {
 
+    gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
+    gl.generateAllShapes();
+
     // loading in the scene data
-    bool success = SceneParser::parse(settings.sceneFilePath, metadata);
+    SceneParser::parse(settings.sceneFilePath, metadata);
     generateMatrices(metadata.cameraData);
 
+    std::cout << "JUST LOADED THE SCENE FILE" << std::endl;
+
+    std::vector<RenderShapeData> shapes = metadata.shapes;
+    for (int index = 0; index < shapes.size(); index++) {
+        switch (shapes[index].primitive.type) {
+            case PrimitiveType::PRIMITIVE_CUBE: {
+                std::cout << "cube" << std::endl;
+                break;
+            }
+            case PrimitiveType::PRIMITIVE_CONE: {
+                std::cout << "cone" << std::endl;
+                break;
+            }
+            case PrimitiveType::PRIMITIVE_SPHERE: {
+                std::cout << "sphere" << std::endl;
+                break;
+            }
+            case PrimitiveType::PRIMITIVE_CYLINDER: {
+                std::cout << "cylinder" << std::endl;
+                break;
+            }
+        }
+    }
+
+        std::cout << "DONE LOADING THE SCENE FILE" << std::endl;
+
+//    this->makeCurrent();
+//    glUniform1f(glGetUniformLocation(m_shader, "ka"), metadata.globalData.ka);
+//    glUniform1f(glGetUniformLocation(m_shader, "kd"), metadata.globalData.kd);
+//    glUniform1f(glGetUniformLocation(m_shader, "ks"), metadata.globalData.ks);
+//    this->doneCurrent();
 
     update(); // asks for a PaintGL() call to occur
 }
