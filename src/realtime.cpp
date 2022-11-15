@@ -69,6 +69,7 @@ void Realtime::initializeGL() {
     // Students: anything requiring OpenGL calls when the program starts should be done here
 
     // clearing screen and loading shader
+
     glClearColor(0, 0, 0, 255);
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
     Debug::glErrorCheck();
@@ -129,7 +130,6 @@ void Realtime::paintGL() {
 
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
-
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[index].ctm[0][0]);
 
         glUniform1f(glGetUniformLocation(m_shader, "ka"), metadata.globalData.ka);
@@ -148,7 +148,12 @@ void Realtime::paintGL() {
 
         glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[index].primitive.material.shininess);
 
+        glUniform1i(glGetUniformLocation(m_shader, "numLights"), fmin(8, metadata.lights.size()));
+
         for (int j = 0; j < metadata.lights.size(); j++) {
+            if (j == 8) {
+                break;
+            }
 
             SceneLightData light = metadata.lights[j];
 
@@ -156,7 +161,7 @@ void Realtime::paintGL() {
             GLint dir_loc = glGetUniformLocation(m_shader, dir_pos.c_str());
             glUniform3f(dir_loc, light.dir[0], light.dir[1], light.dir[2]);
 
-             std::string color_pos = "lightColors[" + std::to_string(j) + "]";
+            std::string color_pos = "lightColors[" + std::to_string(j) + "]";
             GLint color_loc = glGetUniformLocation(m_shader, color_pos.c_str());
             glUniform4f(color_loc, light.color[0], light.color[1], light.color[2], light.color[3]);
         }
@@ -169,7 +174,7 @@ void Realtime::paintGL() {
         // Unbind Vertex Array
         glBindVertexArray(0);
 
-         Debug::glErrorCheck();
+        Debug::glErrorCheck();
 
         // Deactivate the shader program
         glUseProgram(0);
@@ -182,6 +187,8 @@ void Realtime::resizeGL(int w, int h) {
 
     // Students: anything requiring OpenGL calls when the program starts should be done here
     generateMatrices(metadata.cameraData);
+
+    update(); // asks for a PaintGL() call to occur
 }
 
 void Realtime::generateMatrices(SceneCameraData& cameraData) {
@@ -190,6 +197,9 @@ void Realtime::generateMatrices(SceneCameraData& cameraData) {
     m_view = camera.getViewMatrix();
     m_inverse_view = camera.getInverseViewMatrix();
     m_projection = camera.getProjectionMatrix();
+
+//    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
+//    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
 }
 
 void Realtime::sceneChanged() {
@@ -198,14 +208,20 @@ void Realtime::sceneChanged() {
     bool success = SceneParser::parse(settings.sceneFilePath, metadata);
     generateMatrices(metadata.cameraData);
 
+
     update(); // asks for a PaintGL() call to occur
 }
 
 void Realtime::settingsChanged() {
 
     if (is_intialized) {
+
+        this->makeCurrent();
+
         gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
         gl.generateAllShapes();
+
+        this->doneCurrent();
 
         Debug::glErrorCheck();
 

@@ -8,6 +8,8 @@ in vec4 specularCoefficients;
 
 out vec4 fragColor;
 
+uniform int numLights;
+
 uniform vec3 lightDirections[8];
 uniform vec4 lightColors[8];
 
@@ -21,7 +23,7 @@ void main() {
 
     // fragColor = vec4(255);
 
-    for (int i = 0; i < 8; ++i) {
+    for (int i = 0; i < numLights; ++i) {
         vec3 lighting = normalize(-lightDirections[i]);
         float diffuse_dot_product = max(min(dot(normalize(worldSpaceNormal), lighting), 1), 0);
         vec4 diffuse = lightColors[i] * diffuseCoefficients * diffuse_dot_product;
