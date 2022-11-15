@@ -31,9 +31,14 @@ void main() {
 
         vec3 reflection = reflect(-lighting, normalize(worldSpaceNormal));
         vec3 dirToCamera = normalize(vec3(worldSpaceCameraPos) - worldSpacePos);
-        // check 0 cases
-        float shine = max(dot(reflection, dirToCamera), 0);
-        vec4 specular = lightColors[i] * specularCoefficients * pow(shine, shininess);
+        float shine = min(max(dot(reflection, dirToCamera), 0), 1);
+        float shine_factor;
+        if (shine == 0 || shininess == 0) {
+            shine_factor = 0;
+        } else {
+            shine_factor = pow(shine, shininess);
+        }
+        vec4 specular = lightColors[i] * specularCoefficients * shine_factor;
         fragColor = fragColor + specular;
     }
 }

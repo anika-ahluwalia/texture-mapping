@@ -26,10 +26,11 @@ void Sphere::makeTile(glm::vec3 topLeft,
 }
 
 glm::vec3 Sphere::makeCoordinate(float phi, float theta) {
+    float radius = 0.5f;
     float x = glm::sin(phi) * glm::sin(theta);
     float y = glm::cos(phi);
     float z = glm::sin(phi) * glm::cos(theta);
-    return glm::vec3{ x, y, z };
+    return radius * glm::vec3{ x, y, z };
 }
 
 void Sphere::makeWedge(float currentTheta, float nextTheta) {
