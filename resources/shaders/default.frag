@@ -18,10 +18,7 @@ uniform vec4 worldSpaceCameraPos;
 
 void main() {
 
-    // Remember that you need to renormalize vectors here if you want them to be normalized
     fragColor = ambient;
-
-    // fragColor = vec4(255);
 
     for (int i = 0; i < numLights; ++i) {
         vec3 lighting = normalize(-lightDirections[i]);
@@ -33,7 +30,7 @@ void main() {
         vec3 dirToCamera = normalize(vec3(worldSpaceCameraPos) - worldSpacePos);
         float shine = min(max(dot(reflection, dirToCamera), 0), 1);
         float shine_factor;
-        if (shine == 0 || shininess == 0) {
+        if (shine < 0 || (shine == 0 & shininess <= 0)) {
             shine_factor = 0;
         } else {
             shine_factor = pow(shine, shininess);
