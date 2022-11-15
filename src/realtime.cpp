@@ -254,6 +254,8 @@ void Realtime::settingsChanged() {
 
     if (is_intialized) {
 
+        generateMatrices(metadata.cameraData);
+
         this->makeCurrent();
 
         gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
