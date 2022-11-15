@@ -184,6 +184,7 @@ void Realtime::resizeGL(int w, int h) {
     // Students: anything requiring OpenGL calls when the program starts should be done here
     generateMatrices(metadata.cameraData);
 
+    // should this be here?
     update(); // asks for a PaintGL() call to occur
 }
 
@@ -199,9 +200,14 @@ void Realtime::generateMatrices(SceneCameraData& cameraData) {
 //    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
 //    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
 
+//    Debug::glErrorCheck();
+
+
 //    glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
 //    glm::vec4 camera_pos = glm::inverse(m_view) * origin;
 //    glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
+
+//    Debug::glErrorCheck();
 
 //    this->doneCurrent();
 }
@@ -214,32 +220,6 @@ void Realtime::sceneChanged() {
     // loading in the scene data
     SceneParser::parse(settings.sceneFilePath, metadata);
     generateMatrices(metadata.cameraData);
-
-    std::cout << "JUST LOADED THE SCENE FILE" << std::endl;
-
-    std::vector<RenderShapeData> shapes = metadata.shapes;
-    for (int index = 0; index < shapes.size(); index++) {
-        switch (shapes[index].primitive.type) {
-            case PrimitiveType::PRIMITIVE_CUBE: {
-                std::cout << "cube" << std::endl;
-                break;
-            }
-            case PrimitiveType::PRIMITIVE_CONE: {
-                std::cout << "cone" << std::endl;
-                break;
-            }
-            case PrimitiveType::PRIMITIVE_SPHERE: {
-                std::cout << "sphere" << std::endl;
-                break;
-            }
-            case PrimitiveType::PRIMITIVE_CYLINDER: {
-                std::cout << "cylinder" << std::endl;
-                break;
-            }
-        }
-    }
-
-        std::cout << "DONE LOADING THE SCENE FILE" << std::endl;
 
 //    this->makeCurrent();
 //    glUniform1f(glGetUniformLocation(m_shader, "ka"), metadata.globalData.ka);
@@ -261,9 +241,9 @@ void Realtime::settingsChanged() {
         gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
         gl.generateAllShapes();
 
-        this->doneCurrent();
-
         Debug::glErrorCheck();
+
+        this->doneCurrent();
 
         update(); // asks for a PaintGL() call to occur
     }

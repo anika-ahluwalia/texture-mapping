@@ -40,7 +40,10 @@ void Cone::makeTopTile(glm::vec3 topLeft,
     //       but the normals are calculated in a different way!
 
     glm::vec3 avgTop = (bottomLeft + bottomRight) / 2.f;
-    glm::vec3 topNormal = glm::normalize(glm::vec3(avgTop[0], 0.5f*sqrt(pow(avgTop[0], 2) + pow(avgTop[2], 2)), avgTop[2]));
+    float topX = 0.5f * (bottomLeft[0] + bottomRight[0]);
+    float topZ = 0.5f * (bottomLeft[2] + bottomRight[2]);
+    float topY = 0.5f * sqrt(pow(topX, 2) + pow(topZ, 2));
+    glm::vec3 topNormal = glm::normalize(glm::vec3(topX, topY, topZ));
 
     insertVec3(m_vertexData, topLeft);
     insertVec3(m_vertexData, topNormal);
@@ -100,6 +103,8 @@ void Cone::makeWedge(float currentTheta, float nextTheta) {
     float currRadius = 0.5f;
     float radiusIncrement = 0.5f / m_param1;
 
+    float episilon = 0.01f;
+
     for (int i = 0; i < m_param1; i++) {
 
         glm::vec3 topLeft = makeCoordinate(currentTheta, currRadius - radiusIncrement, currHeight + heightIncrement);
@@ -110,7 +115,7 @@ void Cone::makeWedge(float currentTheta, float nextTheta) {
         currHeight += heightIncrement;
         currRadius -= radiusIncrement;
 
-        if (currHeight < 0.5f) {
+        if (abs(0.5f - currHeight) > episilon) {
             makeTile(topLeft, topRight, bottomLeft, bottomRight);
         } else {
             makeTopTile(topLeft, topRight, bottomLeft, bottomRight);
