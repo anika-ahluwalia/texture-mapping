@@ -56,7 +56,6 @@ void Cube::makeFace(glm::vec3 topLeft,
                     glm::vec3 horizontal_transform = glm::vec3 {0, 0, (width / m_param1)};
                     glm::vec3 vertical_transform = glm::vec3 {0, -(height / m_param1), 0};
 
-
                     glm::vec3 newTopLeft = topLeft + transform_vec;
                     glm::vec3 newTopRight = newTopLeft + horizontal_transform;
                     glm::vec3 newBottomLeft = newTopLeft + vertical_transform;
@@ -100,7 +99,6 @@ void Cube::makeFace(glm::vec3 topLeft,
                     glm::vec3 transform_vec = glm::vec3{c*(width / m_param1), -r*(height / m_param1), 0};
                     glm::vec3 horizontal_transform = glm::vec3 {(width / m_param1), 0, 0};
                     glm::vec3 vertical_transform = glm::vec3 {0, -(height / m_param1), 0};
-
 
                     glm::vec3 newTopLeft = topLeft + transform_vec;
                     glm::vec3 newTopRight = newTopLeft + horizontal_transform;

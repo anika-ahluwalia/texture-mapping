@@ -14,9 +14,6 @@ void Cone::makeTile(glm::vec3 topLeft,
                       glm::vec3 topRight,
                       glm::vec3 bottomLeft,
                       glm::vec3 bottomRight) {
-    // Task 5: Implement the makeTile() function for a Sphere
-    // Note: this function is very similar to the makeTile() function for Cube,
-    //       but the normals are calculated in a different way!
     insertVec3(m_vertexData, topLeft);
     insertVec3(m_vertexData, glm::normalize(glm::vec3(topLeft[0], 0.5f*sqrt(pow(topLeft[0], 2) + pow(topLeft[2], 2)), topLeft[2])));
     insertVec3(m_vertexData, bottomLeft);
@@ -35,10 +32,6 @@ void Cone::makeTopTile(glm::vec3 topLeft,
                       glm::vec3 topRight,
                       glm::vec3 bottomLeft,
                       glm::vec3 bottomRight) {
-    // Task 5: Implement the makeTile() function for a Sphere
-    // Note: this function is very similar to the makeTile() function for Cube,
-    //       but the normals are calculated in a different way!
-
     glm::vec3 avgTop = (bottomLeft + bottomRight) / 2.f;
     float topX = 0.5f * (bottomLeft[0] + bottomRight[0]);
     float topZ = 0.5f * (bottomLeft[2] + bottomRight[2]);
@@ -63,9 +56,6 @@ void Cone::makeFlatTile(glm::vec3 topLeft,
                       glm::vec3 topRight,
                       glm::vec3 bottomLeft,
                       glm::vec3 bottomRight) {
-    // Task 5: Implement the makeTile() function for a Sphere
-    // Note: this function is very similar to the makeTile() function for Cube,
-    //       but the normals are calculated in a different way!
     insertVec3(m_vertexData, topLeft);
     insertVec3(m_vertexData, glm::normalize(glm::vec3(0, topLeft[1], 0)));
     insertVec3(m_vertexData, bottomLeft);
@@ -152,13 +142,9 @@ void Cone::makeCone() {
 }
 
 void Cone::setVertexData() {
-    // TODO for Project 5: Lights, Camera
     makeCone();
 }
 
-
-// Inserts a glm::vec3 into a vector of floats.
-// This will come in handy if you want to take advantage of vectors to build your shape!
 void Cone::insertVec3(std::vector<float> &data, glm::vec3 v) {
     data.push_back(v.x);
     data.push_back(v.y);
