@@ -30,13 +30,15 @@ Realtime::Realtime(QWidget *parent)
     m_keyMap[Qt::Key_Space]   = false;
 
     // If you must use this function, do not edit anything above this
+    param1 = settings.shapeParameter1;
+    param2 = settings.shapeParameter2;
+    nearPlane = settings.nearPlane;
+    farPlane = settings.farPlane;
 }
 
 void Realtime::finish() {
     killTimer(m_timer);
     this->makeCurrent();
-
-    // Students: anything requiring OpenGL calls when the program exits should be done here
 
     gl.cleanMemory();
     glDeleteProgram(m_shader);
@@ -66,31 +68,34 @@ void Realtime::initializeGL() {
     // Tells OpenGL how big the screen is
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
-    // Students: anything requiring OpenGL calls when the program starts should be done here
 
     // clearing screen and loading shader
-
     glClearColor(0, 0, 0, 255);
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
 
     // load and bind VBOs and VAOs for each shape
     gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
     gl.generateAllShapes();
+
+    // setting a flag to let us know that it is initialized
     is_intialized = true;
 }
 
 void Realtime::paintGL() {
-    // Students: anything requiring OpenGL calls every frame should be done here
 
     std::vector<RenderShapeData> shapes = metadata.shapes;
 
-    // Clear screen color and depth before painting
+    // clear screen color and depth before painting
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 
     GLuint vao;
     std::vector<float> shape_data;
 
+    // looping through each primitive in the scene
     for (int index = 0; index < shapes.size(); index++) {
+
+        // setting vao and shape data based on the type of the primitive
         switch (shapes[index].primitive.type) {
             case PrimitiveType::PRIMITIVE_CUBE: {
                 vao = gl.cube_vao;
@@ -114,21 +119,27 @@ void Realtime::paintGL() {
             }
         }
 
+        // binding vao and shader
         glBindVertexArray(vao);
-
-
-        // Activate the shader program by calling glUseProgram with `m_shader`
         glUseProgram(m_shader);
 
+        // passing in uniforms specific to this primitive
         glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[index].ctm[0][0]);
+        glUniformMatrix3fv(glGetUniformLocation(m_shader, "invTpModelMatrix"), 1, GL_FALSE, &glm::inverse(glm::transpose(glm::mat3(shapes[index].ctm)))[0][0]);
 
-        glUniform4fv(glGetUniformLocation(m_shader, "cAmbient"), 1, &shapes[index].primitive.material.cAmbient[0]);
-        glUniform4fv(glGetUniformLocation(m_shader, "cDiffuse"), 1, &shapes[index].primitive.material.cDiffuse[0]);
-        glUniform4fv(glGetUniformLocation(m_shader, "cSpecular"), 1, &shapes[index].primitive.material.cSpecular[0]);
+        glm::vec4 ambient = metadata.globalData.ka * shapes[index].primitive.material.cAmbient;
+        glUniform4fv(glGetUniformLocation(m_shader, "ambient"), 1, &ambient[0]);
+        glm::vec4 diffuse = metadata.globalData.kd * shapes[index].primitive.material.cDiffuse;
+        glUniform4fv(glGetUniformLocation(m_shader, "diffuseCoefficients"), 1, &diffuse[0]);
+        glm::vec4 specular = metadata.globalData.ks * shapes[index].primitive.material.cSpecular;
+        glUniform4fv(glGetUniformLocation(m_shader, "specularCoefficients"), 1, &specular[0]);
+
         glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[index].primitive.material.shininess);
 
+        // drawing!!
         glDrawArrays(GL_TRIANGLES, 0, shape_data.size() / 3);
 
+        // unbinding vao and shader
         glBindVertexArray(0);
         glUseProgram(0);
     }
@@ -138,61 +149,53 @@ void Realtime::resizeGL(int w, int h) {
     // Tells OpenGL how big the screen is
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
-    // Students: anything requiring OpenGL calls when the program starts should be done here
+    // regenerates the camera & projection due to parameter change and re-renders the scene
     generateMatrices(metadata.cameraData);
-
-    // should this be here?
     update(); // asks for a PaintGL() call to occur
 }
 
 void Realtime::generateMatrices(SceneCameraData& cameraData) {
+    // creates a new camera with the updated parameters
     Camera camera = Camera(cameraData, size().width(), size().height(), settings.nearPlane, settings.farPlane);
-
-    m_view = camera.getViewMatrix();
-    m_inverse_view = camera.getInverseViewMatrix();
-    m_projection = camera.getProjectionMatrix();
 
     this->makeCurrent();
     glUseProgram(m_shader);
 
-    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &m_view[0][0]);
-    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &m_projection[0][0]);
+    // sets the related uniform variables accordingly
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &camera.getViewMatrix()[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &camera.getProjectionMatrix()[0][0]);
 
     glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
-    glm::vec4 camera_pos = glm::inverse(m_view) * origin;
+    glm::vec4 camera_pos = camera.getInverseViewMatrix() * origin;
     glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
 
     glUseProgram(0);
-
     this->doneCurrent();
 }
 
 void Realtime::sceneChanged() {
 
-    gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
-    gl.generateAllShapes();
-
     // loading in the scene data
     SceneParser::parse(settings.sceneFilePath, metadata);
+    // generating new matrices (because camera data could have changed)
     generateMatrices(metadata.cameraData);
 
     this->makeCurrent();
     glUseProgram(m_shader);
 
-    glUniform1f(glGetUniformLocation(m_shader, "ka"), metadata.globalData.ka);
-    glUniform1f(glGetUniformLocation(m_shader, "kd"), metadata.globalData.kd);
-    glUniform1f(glGetUniformLocation(m_shader, "ks"), metadata.globalData.ks);
+    // setting uniforms based on what changed in the new scene
 
     glUniform1i(glGetUniformLocation(m_shader, "numLights"), fmin(8, metadata.lights.size()));
 
-    for (int j = 0; j < fmin(metadata.lights.size(), 8); j++) {
-        SceneLightData light = metadata.lights[j];
+    // passing in light colors and directions
+    for (int i = 0; i < fmin(metadata.lights.size(), 8); i++) {
+        SceneLightData light = metadata.lights[i];
 
-        std::string dir_pos = "lightDirections[" + std::to_string(j) + "]";
+        std::string dir_pos = "lightDirections[" + std::to_string(i) + "]";
         GLint dir_loc = glGetUniformLocation(m_shader, dir_pos.c_str());
         glUniform3f(dir_loc, light.dir[0], light.dir[1], light.dir[2]);
 
-        std::string color_pos = "lightColors[" + std::to_string(j) + "]";
+        std::string color_pos = "lightColors[" + std::to_string(i) + "]";
         GLint color_loc = glGetUniformLocation(m_shader, color_pos.c_str());
         glUniform4f(color_loc, light.color[0], light.color[1], light.color[2], light.color[3]);
     }
@@ -207,12 +210,23 @@ void Realtime::settingsChanged() {
 
     if (is_intialized) {
 
-        generateMatrices(metadata.cameraData);
-
         this->makeCurrent();
-        gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
-        gl.generateAllShapes();
-        Debug::glErrorCheck();
+
+        // only updating and regenerating what is necessary based on which parameters changed
+
+        if (param1 != settings.shapeParameter1 || param2 != settings.shapeParameter2) {
+            gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
+            gl.generateAllShapes();
+            param1 = settings.shapeParameter1;
+            param2 = settings.shapeParameter2;
+        }
+
+        if (nearPlane != settings.nearPlane || farPlane != settings.farPlane) {
+            generateMatrices(metadata.cameraData);
+            nearPlane = settings.nearPlane;
+            farPlane = settings.farPlane;
+        }
+
         this->doneCurrent();
 
         update(); // asks for a PaintGL() call to occur

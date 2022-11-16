@@ -1,6 +1,5 @@
 #include <stdexcept>
 #include "camera.h"
-#include "glm/ext/matrix_clip_space.hpp"
 
 Camera::Camera(SceneCameraData& camera_data, int width, int height, float nearPlane, float farPlane) {
     cam_data = camera_data;
@@ -85,12 +84,4 @@ float Camera::getAspectRatio() const {
 
 float Camera::getHeightAngle() const {
     return cam_data.heightAngle;
-}
-
-float Camera::getFocalLength() const {
-    return cam_data.focalLength;
-}
-
-float Camera::getAperture() const {
-    return cam_data.aperture;
 }

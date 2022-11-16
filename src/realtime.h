@@ -56,15 +56,16 @@ private:
 
 
 
+    // helper class to store VAOs and VBOs
     GLHelper gl;
 
     bool is_intialized = false;
 
     RenderData metadata;
+    GLuint m_shader;
 
-    glm::mat4 m_view;
-    glm::mat4 m_inverse_view;
-    glm::mat4 m_projection;
-
-    GLuint m_shader;       //Stores id for shader program
+    int param1 = 1;
+    int param2 = 1;
+    float nearPlane = 1;
+    float farPlane = 1;
 };
