@@ -1,4 +1,4 @@
-#include "Cone.h"
+#include "cone.h"
 #include "glm/gtc/constants.hpp"
 #include "glm/gtx/transform.hpp"
 #include "glm/gtc/matrix_transform.hpp"
