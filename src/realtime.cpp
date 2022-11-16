@@ -184,7 +184,6 @@ void Realtime::sceneChanged() {
     glUseProgram(m_shader);
 
     // setting uniforms based on what changed in the new scene
-
     glUniform1i(glGetUniformLocation(m_shader, "numLights"), fmin(8, metadata.lights.size()));
 
     // passing in light colors and directions
@@ -198,6 +197,13 @@ void Realtime::sceneChanged() {
         std::string color_pos = "lightColors[" + std::to_string(i) + "]";
         GLint color_loc = glGetUniformLocation(m_shader, color_pos.c_str());
         glUniform4f(color_loc, light.color[0], light.color[1], light.color[2], light.color[3]);
+    }
+
+    // adaptive level of detail
+    if (settings.extraCredit1) {
+        int param = 25 / metadata.shapes.size();
+        gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
+        gl.generateAllShapes();
     }
 
     glUseProgram(0);
@@ -214,11 +220,22 @@ void Realtime::settingsChanged() {
 
         // only updating and regenerating what is necessary based on which parameters changed
 
-        if (param1 != settings.shapeParameter1 || param2 != settings.shapeParameter2) {
-            gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
+        // adaptive level of detail
+        if (settings.extraCredit1 && !adaptiveDetail) {
+            adaptiveDetail = true;
+            int param = fmax(fmin(40 / metadata.shapes.size(), 25), 3);
+            gl = GLHelper(param, param);
             gl.generateAllShapes();
-            param1 = settings.shapeParameter1;
-            param2 = settings.shapeParameter2;
+        }
+
+        if (param1 != settings.shapeParameter1 || param2 != settings.shapeParameter2 || (!settings.extraCredit1 && adaptiveDetail)) {
+            if (!settings.extraCredit1) {
+                adaptiveDetail = false;
+                gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
+                gl.generateAllShapes();
+                param1 = settings.shapeParameter1;
+                param2 = settings.shapeParameter2;
+            }
         }
 
         if (nearPlane != settings.nearPlane || farPlane != settings.farPlane) {

@@ -68,4 +68,6 @@ private:
     int param2 = 1;
     float nearPlane = 1;
     float farPlane = 1;
+
+    bool adaptiveDetail = false;
 };

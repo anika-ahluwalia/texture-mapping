@@ -25,4 +25,4 @@ new folder to store all of the unit shape generations.
 No known bugs.
 
 ### Extra Credit
-None.
+Extra Credit #1: Adaptive level of detail based on the number of objects in the scene.
