@@ -69,5 +69,8 @@ private:
     float nearPlane = 1;
     float farPlane = 1;
 
-    bool adaptiveDetail = false;
+    // storing for extra credit
+    bool adaptiveShapes = false;
+    bool adaptiveDistance = false;
+    glm::vec4 camera_pos;
 };

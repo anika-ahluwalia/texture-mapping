@@ -13,7 +13,8 @@ public:
     GLHelper(int param1, int param2);
     void cleanMemory();
     void generateAllShapes();
-    void makeShape(GLuint &vbo, GLuint &vao, std::vector<float> shape_data);
+    void makeOneShape(PrimitiveType type, int param1, int param2);
+    void createVAOVBO(GLuint &vbo, GLuint &vao, std::vector<float> shape_data);
 
     GLuint cube_vbo;       //Stores id for cube vbo
     GLuint cube_vao;       //Stores id for cube vao

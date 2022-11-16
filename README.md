@@ -25,4 +25,9 @@ new folder to store all of the unit shape generations.
 No known bugs.
 
 ### Extra Credit
-Extra Credit #1: Adaptive level of detail based on the number of objects in the scene.
+Extra Credit #1: Adaptive level of detail based on the number of objects in the scene. 
+Related code is in realtime.cpp in the SettingsChanged function.
+
+Extra Credit #2: Adaptive level of detail based on object's distance from the camera.
+Related code is in realtime.cpp in the SettingsChanged function and at the start of the
+loop in paintgl().

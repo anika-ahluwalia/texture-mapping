@@ -26,41 +26,13 @@ void GLHelper::cleanMemory() {
 }
 
 void GLHelper::generateAllShapes() {
-    for (int i = 1; i < 5; i++) {
-        switch (i) {
-            case 1: {
-                Cylinder cylinder = Cylinder();
-                cylinder.updateParams(m_param1, std::max(m_param2, 3));
-                cylinder_data = cylinder.generateShape();
-                makeShape(cylinder_vbo, cylinder_vao, cylinder_data);
-                break;
-            }
-            case 2: {
-                Sphere sphere = Sphere();
-                sphere.updateParams(std::max(m_param1, 2), std::max(m_param2, 3));
-                sphere_data = sphere.generateShape();
-                makeShape(sphere_vbo, sphere_vao, sphere_data);
-                break;
-            }
-            case 3: {
-                Cube cube = Cube();
-                cube.updateParams(m_param1);
-                cube_data = cube.generateShape();
-                makeShape(cube_vbo, cube_vao, cube_data);
-                break;
-            }
-            case 4: {
-                Cone cone = Cone();
-                cone.updateParams(m_param1, std::max(m_param2, 3));
-                cone_data = cone.generateShape();
-                makeShape(cone_vbo, cone_vao, cone_data);
-                break;
-            }
-        }
-    }
+    makeOneShape(PrimitiveType::PRIMITIVE_CUBE, m_param1, m_param2);
+    makeOneShape(PrimitiveType::PRIMITIVE_CONE, m_param1, m_param2);
+    makeOneShape(PrimitiveType::PRIMITIVE_CYLINDER, m_param1, m_param2);
+    makeOneShape(PrimitiveType::PRIMITIVE_SPHERE, m_param1, m_param2);
 }
 
-void GLHelper::makeShape(GLuint &vbo, GLuint &vao, std::vector<float> shape_data) {
+void GLHelper::createVAOVBO(GLuint &vbo, GLuint &vao, std::vector<float> shape_data) {
     // Vertex Buffer Objects //
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -79,4 +51,37 @@ void GLHelper::makeShape(GLuint &vbo, GLuint &vao, std::vector<float> shape_data
     // unbinding
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
+}
+
+void GLHelper::makeOneShape(PrimitiveType type, int param1, int param2) {
+    switch (type) {
+        case PrimitiveType::PRIMITIVE_CUBE: {
+            Cube cube = Cube();
+            cube.updateParams(param1);
+            cube_data = cube.generateShape();
+            createVAOVBO(cube_vbo, cube_vao, cube_data);
+            break;
+        }
+        case PrimitiveType::PRIMITIVE_CONE: {
+            Cone cone = Cone();
+            cone.updateParams(m_param1, std::max(param2, 3));
+            cone_data = cone.generateShape();
+            createVAOVBO(cone_vbo, cone_vao, cone_data);
+            break;
+        }
+        case PrimitiveType::PRIMITIVE_SPHERE: {
+            Sphere sphere = Sphere();
+            sphere.updateParams(std::max(param1, 2), std::max(param2, 3));
+            sphere_data = sphere.generateShape();
+            createVAOVBO(sphere_vbo, sphere_vao, sphere_data);
+            break;
+        }
+        case PrimitiveType::PRIMITIVE_CYLINDER: {
+            Cylinder cylinder = Cylinder();
+            cylinder.updateParams(param1, std::max(param2, 3));
+            cylinder_data = cylinder.generateShape();
+            createVAOVBO(cylinder_vbo, cylinder_vao, cylinder_data);
+            break;
+        }
+    }
 }

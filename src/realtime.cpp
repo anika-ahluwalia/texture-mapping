@@ -95,6 +95,14 @@ void Realtime::paintGL() {
     // looping through each primitive in the scene
     for (int index = 0; index < shapes.size(); index++) {
 
+        if (settings.extraCredit2) {
+            glm::vec4 objectMiddle = glm::vec4{0.f, 0.f, 0.f, 1.f};
+            glm::vec4 objectInWorldSpace = shapes[index].ctm * objectMiddle;
+            float distance = glm::length(objectInWorldSpace - camera_pos);
+            int param = fmax(fmin(80 / distance, 25), 3);
+            gl.makeOneShape(shapes[index].primitive.type, param, param);
+        }
+
         // setting vao and shape data based on the type of the primitive
         switch (shapes[index].primitive.type) {
             case PrimitiveType::PRIMITIVE_CUBE: {
@@ -166,7 +174,7 @@ void Realtime::generateMatrices(SceneCameraData& cameraData) {
     glUniformMatrix4fv(glGetUniformLocation(m_shader, "projectionMatrix"), 1, GL_FALSE, &camera.getProjectionMatrix()[0][0]);
 
     glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
-    glm::vec4 camera_pos = camera.getInverseViewMatrix() * origin;
+    camera_pos = camera.getInverseViewMatrix() * origin;
     glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
 
     glUseProgram(0);
@@ -221,16 +229,20 @@ void Realtime::settingsChanged() {
         // only updating and regenerating what is necessary based on which parameters changed
 
         // adaptive level of detail
-        if (settings.extraCredit1 && !adaptiveDetail) {
-            adaptiveDetail = true;
+        if (settings.extraCredit1 && !adaptiveShapes) {
+            adaptiveShapes = true;
             int param = fmax(fmin(40 / metadata.shapes.size(), 25), 3);
             gl = GLHelper(param, param);
             gl.generateAllShapes();
         }
+        if (settings.extraCredit2 && !adaptiveDistance) {
+            adaptiveDistance = true;
+        }
 
-        if (param1 != settings.shapeParameter1 || param2 != settings.shapeParameter2 || (!settings.extraCredit1 && adaptiveDetail)) {
-            if (!settings.extraCredit1) {
-                adaptiveDetail = false;
+        if (param1 != settings.shapeParameter1 || param2 != settings.shapeParameter2 || (!settings.extraCredit1 && adaptiveShapes) || (!settings.extraCredit2 && adaptiveDistance)) {
+            if (!settings.extraCredit1 && !settings.extraCredit2) {
+                adaptiveShapes = false;
+                // adaptiveDistance = false;
                 gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
                 gl.generateAllShapes();
                 param1 = settings.shapeParameter1;
