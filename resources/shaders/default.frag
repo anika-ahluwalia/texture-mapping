@@ -2,9 +2,6 @@
 
 in vec3 worldSpacePos;
 in vec3 worldSpaceNormal;
-//in vec4 ambient;
-//in vec4 diffuseCoefficients;
-//in vec4 specularCoefficients;
 
 out vec4 fragColor;
 

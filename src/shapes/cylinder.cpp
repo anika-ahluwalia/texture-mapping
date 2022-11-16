@@ -14,9 +14,6 @@ void Cylinder::makeTile(glm::vec3 topLeft,
                       glm::vec3 topRight,
                       glm::vec3 bottomLeft,
                       glm::vec3 bottomRight) {
-    // Task 5: Implement the makeTile() function for a Sphere
-    // Note: this function is very similar to the makeTile() function for Cube,
-    //       but the normals are calculated in a different way!
     insertVec3(m_vertexData, topLeft);
     insertVec3(m_vertexData, glm::normalize(glm::vec3(topLeft[0], 0, topLeft[2])));
     insertVec3(m_vertexData, bottomLeft);
@@ -35,9 +32,6 @@ void Cylinder::makeFlatTile(glm::vec3 topLeft,
                       glm::vec3 topRight,
                       glm::vec3 bottomLeft,
                       glm::vec3 bottomRight) {
-    // Task 5: Implement the makeTile() function for a Sphere
-    // Note: this function is very similar to the makeTile() function for Cube,
-    //       but the normals are calculated in a different way!
     insertVec3(m_vertexData, topLeft);
     insertVec3(m_vertexData, glm::normalize(glm::vec3(0, topLeft[1], 0)));
     insertVec3(m_vertexData, bottomLeft);
@@ -124,12 +118,9 @@ void Cylinder::makeCylinder() {
 }
 
 void Cylinder::setVertexData() {
-    // TODO for Project 5: Lights, Camera
     makeCylinder();
 }
 
-// Inserts a glm::vec3 into a vector of floats.
-// This will come in handy if you want to take advantage of vectors to build your shape!
 void Cylinder::insertVec3(std::vector<float> &data, glm::vec3 v) {
     data.push_back(v.x);
     data.push_back(v.y);

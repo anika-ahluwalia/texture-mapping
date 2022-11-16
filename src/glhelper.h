@@ -13,11 +13,7 @@ public:
     GLHelper(int param1, int param2);
     void cleanMemory();
     void generateAllShapes();
-
-    void generateCubeVBOsVAOs();
-    void generateSphereVBOsVAOs();
-    void generateCylinderVBOsVAOs();
-    void generateConeVBOsVAOs();
+    void makeShape(GLuint &vbo, GLuint &vao, std::vector<float> shape_data);
 
     GLuint cube_vbo;       //Stores id for cube vbo
     GLuint cube_vao;       //Stores id for cube vao
