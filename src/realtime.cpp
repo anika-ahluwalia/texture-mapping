@@ -198,6 +198,13 @@ void Realtime::sceneChanged() {
     for (int i = 0; i < fmin(metadata.lights.size(), 8); i++) {
         SceneLightData light = metadata.lights[i];
 
+        // modify empties ?? (ex. direction for point & spot light)
+
+        std::string type_pos = "lightTypes[" + std::to_string(i) + "]";
+        GLint type_loc = glGetUniformLocation(m_shader, type_pos.c_str());
+        int type = light.type == LightType::LIGHT_DIRECTIONAL ? 0 : light.type == LightType::LIGHT_POINT ? 1 : 2;
+        glUniform1i(type_loc, type);
+
         std::string dir_pos = "lightDirections[" + std::to_string(i) + "]";
         GLint dir_loc = glGetUniformLocation(m_shader, dir_pos.c_str());
         glUniform3f(dir_loc, light.dir[0], light.dir[1], light.dir[2]);
@@ -205,6 +212,22 @@ void Realtime::sceneChanged() {
         std::string color_pos = "lightColors[" + std::to_string(i) + "]";
         GLint color_loc = glGetUniformLocation(m_shader, color_pos.c_str());
         glUniform4f(color_loc, light.color[0], light.color[1], light.color[2], light.color[3]);
+
+        std::string pos_pos = "lightPositions[" + std::to_string(i) + "]";
+        GLint pos_loc = glGetUniformLocation(m_shader, pos_pos.c_str());
+        glUniform4f(pos_loc, light.pos[0], light.pos[1], light.pos[2], light.pos[3]);
+
+        std::string func_pos = "lightFunctions[" + std::to_string(i) + "]";
+        GLint func_loc = glGetUniformLocation(m_shader, func_pos.c_str());
+        glUniform3f(func_loc, light.function[0], light.function[1], light.function[2]);
+
+        std::string angle_pos = "lightAngles[" + std::to_string(i) + "]";
+        GLint angle_loc = glGetUniformLocation(m_shader, angle_pos.c_str());
+        glUniform1f(angle_loc, light.angle);
+
+        std::string pen_pos = "lightPenumbras[" + std::to_string(i) + "]";
+        GLint pen_loc = glGetUniformLocation(m_shader, pen_pos.c_str());
+        glUniform1f(pen_loc, light.penumbra);
     }
 
     // adaptive level of detail
