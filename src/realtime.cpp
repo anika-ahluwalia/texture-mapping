@@ -301,8 +301,6 @@ void Realtime::mousePressEvent(QMouseEvent *event) {
         m_mouseDown = true;
         m_prev_mouse_pos = glm::vec2(event->position().x(), event->position().y());
     }
-
-    // change look and up for rotation
 }
 
 void Realtime::mouseReleaseEvent(QMouseEvent *event) {
@@ -336,24 +334,26 @@ void Realtime::timerEvent(QTimerEvent *event) {
     glm::vec3 translation_vec = glm::vec3 {0,0,0};
 
     // change position vector for translation
+    glm::vec3 look = metadata.cameraData.look;
+    glm::vec3 up = metadata.cameraData.up;
 
     if (m_keyMap[Qt::Key_W]) {
-        translation_vec = 5.f * deltaTime * camera.getLook();
+        translation_vec = 5.f * deltaTime * glm::normalize(look);
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_S]) {
-        translation_vec = -5.f * deltaTime * camera.getLook();
+        translation_vec = -5.f * deltaTime * glm::normalize(look);
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_A]) {
-        translation_vec = -5.f * deltaTime * glm::cross(camera.getLook(), camera.getUp());
+        translation_vec = -5.f * deltaTime * glm::normalize(glm::cross(look, up));
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_D]) {
-        translation_vec = 5.f * deltaTime * glm::cross(camera.getLook(), camera.getUp());
+        translation_vec = 5.f * deltaTime * glm::normalize(glm::cross(look, up));
         changeFlag = true;
     }
 
@@ -368,21 +368,8 @@ void Realtime::timerEvent(QTimerEvent *event) {
     }
 
     if (changeFlag) {
-        camera.translate(translation_vec);
-
-        this->makeCurrent();
-        glUseProgram(m_shader);
-
-        // sets the related uniform variables accordingly
-        glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &camera.getViewMatrix()[0][0]);
-        glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
-        camera_pos = camera.getInverseViewMatrix() * origin;
-        glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
-
-        glUseProgram(0);
-        this->doneCurrent();
-
-        // update();
+        metadata.cameraData.pos = metadata.cameraData.pos + glm::vec4(translation_vec, 0);
+        generateMatrices(metadata.cameraData);
     }
 
     update(); // asks for a PaintGL() call to occur
