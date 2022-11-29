@@ -1,12 +1,21 @@
+#include <ostream>
 #include <stdexcept>
 #include "camera.h"
+#include <iostream>
 
 Camera::Camera(SceneCameraData& camera_data, int width, int height, float nearPlane, float farPlane) {
-    cam_data = camera_data;
+    // cam_data = camera_data;
     s_width = width;
     s_height = height;
     near_plane = nearPlane;
     far_plane = farPlane;
+
+    heightAngle = camera_data.heightAngle;
+
+    pos = camera_data.pos;
+    look = camera_data.look;
+    up = camera_data.up;
+
     view_matrix = createViewMatrix();
     inverse_view_matrix = createInverseViewMatrix();
     projection_matrix = createProjectionMatrix();
@@ -14,17 +23,14 @@ Camera::Camera(SceneCameraData& camera_data, int width, int height, float nearPl
 
 // only creating the camera view matrix once
 glm::mat4 Camera::createViewMatrix() {
-    glm::vec4 pos = cam_data.pos;
-    glm::vec3 look = {cam_data.look[0], cam_data.look[1], cam_data.look[2]};
-    glm::vec3 up = {cam_data.up[0], cam_data.up[1], cam_data.up[2]};
 
     glm::mat4 translate = glm::mat4(1.f, 0.f, 0.f, 0.f,
                                     0.f, 1.f, 0.f, 0.f,
                                     0.f, 0.f, 1.f, 0.f,
                                     -1 *pos[0], -1 * pos[1], -1 * pos[2], 1.f);
 
-    glm::vec3 w = -1.f * glm::normalize(look);
-    glm::vec3 v = glm::normalize(up - (dot(up, w)*w));
+    glm::vec3 w = -1.f * glm::normalize(glm::vec3(look));
+    glm::vec3 v = glm::normalize(glm::vec3(up) - (dot(glm::vec3(up), w)*w));
     glm::vec3 u = cross(v, w);
 
     glm::mat4 rotate = glm::mat4(u[0], v[0], w[0], 0.f,
@@ -66,6 +72,29 @@ glm::mat4 Camera::createProjectionMatrix() {
     return transformation * unhinging * scaling;
 }
 
+void Camera::translate(glm::vec4 translation) {
+    pos = pos + glm::vec4(glm::vec3(translation), 0);
+    view_matrix = createViewMatrix();
+    inverse_view_matrix = createInverseViewMatrix();
+}
+
+void Camera::rotate(glm::vec4 look, glm::vec4 up) {
+//    look = look;
+//    up = up;
+    view_matrix = createViewMatrix();
+    inverse_view_matrix = createInverseViewMatrix();
+}
+
+glm::vec4 Camera::getPos() {
+    return pos;
+}
+glm::vec4 Camera::getLook() {
+    return look;
+}
+glm::vec4 Camera::getUp() {
+    return up;
+}
+
 glm::mat4 Camera::getViewMatrix() const {
     return view_matrix;
 }
@@ -83,5 +112,5 @@ float Camera::getAspectRatio() const {
 }
 
 float Camera::getHeightAngle() const {
-    return cam_data.heightAngle;
+    return heightAngle;
 }

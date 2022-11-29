@@ -16,6 +16,7 @@
 
 Realtime::Realtime(QWidget *parent)
     : QOpenGLWidget(parent),
+      camera({ metadata.cameraData, 0, 0, 0, 0 }),
       gl({ settings.shapeParameter1, settings.shapeParameter2 })
 {
     m_prev_mouse_pos = glm::vec2(size().width()/2, size().height()/2);
@@ -164,7 +165,7 @@ void Realtime::resizeGL(int w, int h) {
 
 void Realtime::generateMatrices(SceneCameraData& cameraData) {
     // creates a new camera with the updated parameters
-    Camera camera = Camera(cameraData, size().width(), size().height(), settings.nearPlane, settings.farPlane);
+    camera = Camera(cameraData, size().width(), size().height(), settings.nearPlane, settings.farPlane);
 
     this->makeCurrent();
     glUseProgram(m_shader);
@@ -300,6 +301,8 @@ void Realtime::mousePressEvent(QMouseEvent *event) {
         m_mouseDown = true;
         m_prev_mouse_pos = glm::vec2(event->position().x(), event->position().y());
     }
+
+    // change look and up for rotation
 }
 
 void Realtime::mouseReleaseEvent(QMouseEvent *event) {
@@ -328,6 +331,57 @@ void Realtime::timerEvent(QTimerEvent *event) {
     m_elapsedTimer.restart();
 
     // Use deltaTime and m_keyMap here to move around
+
+    bool changeFlag = false;
+    glm::vec4 translation_vec = glm::vec4 {0,0,0,0};
+
+    // change position vector for translation
+
+    if (m_keyMap[Qt::Key_W]) {
+        translation_vec = 5.f * deltaTime * camera.getLook();
+        changeFlag = true;
+    }
+
+    if (m_keyMap[Qt::Key_S]) {
+        translation_vec = 5.f * deltaTime * -camera.getLook();
+        changeFlag = true;
+    }
+
+    if (m_keyMap[Qt::Key_A]) {
+        changeFlag = true;
+    }
+
+    if (m_keyMap[Qt::Key_D]) {
+        changeFlag = true;
+    }
+
+    if (m_keyMap[Qt::Key_Space]) {
+        translation_vec = 5.f * deltaTime * glm::vec4{0, 1, 0, 0};
+        changeFlag = true;
+    }
+
+    if (m_keyMap[Qt::Key_Control]) {
+        translation_vec = 5.f * deltaTime * glm::vec4{0, -1, 0, 0};
+        changeFlag = true;
+    }
+
+    if (changeFlag) {
+        camera.translate(translation_vec);
+
+        this->makeCurrent();
+        glUseProgram(m_shader);
+
+        // sets the related uniform variables accordingly
+        glUniformMatrix4fv(glGetUniformLocation(m_shader, "viewMatrix"), 1, GL_FALSE, &camera.getViewMatrix()[0][0]);
+        glm::vec4 origin = {0.f, 0.f, 0.f, 1.f};
+        camera_pos = camera.getInverseViewMatrix() * origin;
+        glUniform4fv(glGetUniformLocation(m_shader, "worldSpaceCameraPos"), 1, &camera_pos[0]);
+
+        glUseProgram(0);
+        this->doneCurrent();
+
+        // update();
+    }
 
     update(); // asks for a PaintGL() call to occur
 }

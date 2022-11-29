@@ -64,6 +64,8 @@ private:
     RenderData metadata;
     GLuint m_shader;
 
+    Camera camera;
+
     int param1 = 1;
     int param2 = 1;
     float nearPlane = 1;

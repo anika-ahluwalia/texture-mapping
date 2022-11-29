@@ -61,9 +61,7 @@ void main() {
         }
         vec4 specular = lightColors[i] * specularCoefficients * shine_factor;
 
-
         // calculating attenuation
-        // DOES LENGTH WORK ??
         float distance = length(worldSpacePos - vec3(lightPositions[i]));
         float att = 1 / (lightFunctions[i][0] + distance * lightFunctions[i][1] + pow(distance, 2) * lightFunctions[i][2]);
         att = min(max(att, 0), 1);
@@ -72,8 +70,10 @@ void main() {
             specular = att * specular;
         }
 
-
         // adjusting if it is a spot light
+
+        // maybe just pass in falloff so its only calculated once?
+        // don't pass in angles and penumbras
         if (lightTypes[i] == 2) {
             vec3 lightToPosition = normalize(worldSpacePos - vec3(lightPositions[i]));
             vec3 direction = normalize(lightDirections[i]);
