@@ -21,12 +21,12 @@ public:
     // Returns the height angle of the camera in RADIANS.
     float getHeightAngle() const;
 
-    void translate(glm::vec4 translation);
+    void translate(glm::vec3 translation);
     void rotate(glm::vec4 look, glm::vec4 up);
     // SceneCameraData getCamData();
-    glm::vec4 getPos();
-    glm::vec4 getLook();
-    glm::vec4 getUp();
+    glm::vec3 getPos();
+    glm::vec3 getLook();
+    glm::vec3 getUp();
 
 protected:
     glm::mat4 createViewMatrix();

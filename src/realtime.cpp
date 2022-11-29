@@ -333,7 +333,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
     // Use deltaTime and m_keyMap here to move around
 
     bool changeFlag = false;
-    glm::vec4 translation_vec = glm::vec4 {0,0,0,0};
+    glm::vec3 translation_vec = glm::vec3 {0,0,0};
 
     // change position vector for translation
 
@@ -343,25 +343,27 @@ void Realtime::timerEvent(QTimerEvent *event) {
     }
 
     if (m_keyMap[Qt::Key_S]) {
-        translation_vec = 5.f * deltaTime * -camera.getLook();
+        translation_vec = -5.f * deltaTime * camera.getLook();
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_A]) {
+        translation_vec = -5.f * deltaTime * glm::cross(camera.getLook(), camera.getUp());
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_D]) {
+        translation_vec = 5.f * deltaTime * glm::cross(camera.getLook(), camera.getUp());
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_Space]) {
-        translation_vec = 5.f * deltaTime * glm::vec4{0, 1, 0, 0};
+        translation_vec = 5.f * deltaTime * glm::vec3 {0, 1, 0};
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_Control]) {
-        translation_vec = 5.f * deltaTime * glm::vec4{0, -1, 0, 0};
+        translation_vec = 5.f * deltaTime * glm::vec3 {0, -1, 0};
         changeFlag = true;
     }
 

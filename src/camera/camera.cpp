@@ -72,8 +72,8 @@ glm::mat4 Camera::createProjectionMatrix() {
     return transformation * unhinging * scaling;
 }
 
-void Camera::translate(glm::vec4 translation) {
-    pos = pos + glm::vec4(glm::vec3(translation), 0);
+void Camera::translate(glm::vec3 translation) {
+    pos = pos + glm::vec4(translation, 0);
     view_matrix = createViewMatrix();
     inverse_view_matrix = createInverseViewMatrix();
 }
@@ -85,13 +85,13 @@ void Camera::rotate(glm::vec4 look, glm::vec4 up) {
     inverse_view_matrix = createInverseViewMatrix();
 }
 
-glm::vec4 Camera::getPos() {
+glm::vec3 Camera::getPos() {
     return pos;
 }
-glm::vec4 Camera::getLook() {
+glm::vec3 Camera::getLook() {
     return look;
 }
-glm::vec4 Camera::getUp() {
+glm::vec3 Camera::getUp() {
     return up;
 }
 
