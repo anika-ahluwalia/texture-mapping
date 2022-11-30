@@ -335,23 +335,19 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
         m_prev_mouse_pos = glm::vec2(posX, posY);
 
         // Use deltaX and deltaY here to rotate
-        // only change look vector
         glm::vec3 look = metadata.cameraData.look;
         glm::vec3 up = metadata.cameraData.up;
 
         glm::vec3 xAxis = glm::vec3 {0, 1, 0};
         glm::vec3 yAxis = glm::normalize(glm::cross(look, up));
 
-        // float thetaX = fmax(fmin((float(deltaX) / float(size().width())) * M_PI, 2 * M_PI), -2 * M_PI);
         float thetaX = float(deltaX) / float(size().width()) * M_PI;
-        glm::vec3 xRotated = look * cos(thetaX) + glm::cross(xAxis, look) * sin(thetaX) + xAxis * glm::dot(xAxis, look) * (1 - cos(thetaX));
+        look = look * cos(thetaX) + glm::cross(xAxis, look) * sin(thetaX) + xAxis * glm::dot(xAxis, look) * (1 - cos(thetaX));
 
-        // float thetaY = fmax(fmin((float(deltaY) / float(size().height())) * M_PI, 2 * M_PI), -2 * M_PI);
         float thetaY = float(deltaY) / float(size().height()) * M_PI;
-        glm::vec3 yRotated = look * cos(thetaY) + glm::cross(yAxis, look) * sin(thetaY) + yAxis * glm::dot(yAxis, look) * (1 - cos(thetaY));
+        look = look * cos(thetaY) + glm::cross(yAxis, look) * sin(thetaY) + yAxis * glm::dot(yAxis, look) * (1 - cos(thetaY));
 
-
-        metadata.cameraData.look = metadata.cameraData.look + glm::vec4(xRotated, 0) + glm::vec4(yRotated, 0);
+        metadata.cameraData.look = glm::vec4(look, 0);
         generateMatrices(metadata.cameraData);
 
         update(); // asks for a PaintGL() call to occur
