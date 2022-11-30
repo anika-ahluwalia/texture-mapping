@@ -318,6 +318,22 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
         m_prev_mouse_pos = glm::vec2(posX, posY);
 
         // Use deltaX and deltaY here to rotate
+        // only change look vector
+        glm::vec3 look = metadata.cameraData.look;
+        glm::vec3 up = metadata.cameraData.up;
+
+        glm::vec3 xAxis = glm::vec3 {0, 1, 0};
+        glm::vec3 yAxis = glm::normalize(glm::cross(look, up));
+
+        float thetaX = deltaX / 50.f;
+        glm::vec3 xRotated = look * cos(thetaX) + glm::cross(xAxis, look) * sin(thetaX) + xAxis * glm::dot(xAxis, look) * (1 - cos(thetaX));
+
+        float thetaY = deltaY / 50.f;
+        glm::vec3 yRotated = look * cos(thetaY) + glm::cross(yAxis, look) * sin(thetaY) + yAxis * glm::dot(yAxis, look) * (1 - cos(thetaY));
+
+
+        metadata.cameraData.look = metadata.cameraData.look + glm::vec4(xRotated, 0) + glm::vec4(yRotated, 0);
+        generateMatrices(metadata.cameraData);
 
         update(); // asks for a PaintGL() call to occur
     }
@@ -327,8 +343,6 @@ void Realtime::timerEvent(QTimerEvent *event) {
     int elapsedms   = m_elapsedTimer.elapsed();
     float deltaTime = elapsedms * 0.001f;
     m_elapsedTimer.restart();
-
-    // Use deltaTime and m_keyMap here to move around
 
     bool changeFlag = false;
     glm::vec3 translation_vec = glm::vec3 {0,0,0};
@@ -362,7 +376,7 @@ void Realtime::timerEvent(QTimerEvent *event) {
         changeFlag = true;
     }
 
-    if (m_keyMap[Qt::Key_Control]) {
+    if (m_keyMap[Qt::Key_Control] || m_keyMap[Qt::Key_Meta]) {
         translation_vec = 5.f * deltaTime * glm::vec3 {0, -1, 0};
         changeFlag = true;
     }
