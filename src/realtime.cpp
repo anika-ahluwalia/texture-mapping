@@ -73,6 +73,7 @@ void Realtime::initializeGL() {
     // clearing screen and loading shader
     glClearColor(0, 0, 0, 255);
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
+    m_invert_shader = ShaderLoader::createShaderProgram(":/resources/shaders/invert.vert", ":/resources/shaders/invert.frag");
 
     // load and bind VBOs and VAOs for each shape
     gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
@@ -153,6 +154,22 @@ void Realtime::paintGL() {
         glUseProgram(0);
     }
 }
+
+//void Realtime::paintInvert(GLuint texture) {
+//    glUseProgram(m_invert_shader);
+//    glUniform1i(glGetUniformLocation(m_invert_shader, "inverting"), settings.perPixelFilter);
+
+//    glBindVertexArray(m_fullscreen_vao);
+//    // Task 10: Bind "texture" to slot 0
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, texture);
+
+//    glDrawArrays(GL_TRIANGLES, 0, 6);
+//    glBindTexture(GL_TEXTURE_2D, 0);
+//    glBindVertexArray(0);
+//    glUseProgram(0);
+//}
+
 
 void Realtime::resizeGL(int w, int h) {
     // Tells OpenGL how big the screen is
@@ -325,10 +342,12 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
         glm::vec3 xAxis = glm::vec3 {0, 1, 0};
         glm::vec3 yAxis = glm::normalize(glm::cross(look, up));
 
-        float thetaX = deltaX / 50.f;
+        // float thetaX = fmax(fmin((float(deltaX) / float(size().width())) * M_PI, 2 * M_PI), -2 * M_PI);
+        float thetaX = float(deltaX) / float(size().width()) * M_PI;
         glm::vec3 xRotated = look * cos(thetaX) + glm::cross(xAxis, look) * sin(thetaX) + xAxis * glm::dot(xAxis, look) * (1 - cos(thetaX));
 
-        float thetaY = deltaY / 50.f;
+        // float thetaY = fmax(fmin((float(deltaY) / float(size().height())) * M_PI, 2 * M_PI), -2 * M_PI);
+        float thetaY = float(deltaY) / float(size().height()) * M_PI;
         glm::vec3 yRotated = look * cos(thetaY) + glm::cross(yAxis, look) * sin(thetaY) + yAxis * glm::dot(yAxis, look) * (1 - cos(thetaY));
 
 

@@ -63,6 +63,7 @@ private:
 
     RenderData metadata;
     GLuint m_shader;
+    GLuint m_invert_shader;
 
     Camera camera;
 
