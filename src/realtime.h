@@ -32,8 +32,6 @@ protected:
     void paintGL() override;                            // Called whenever the OpenGL context changes or by an update() request
     void resizeGL(int width, int height) override;      // Called when window size changes
 
-    void generateMatrices(SceneCameraData& cameraData);
-
 private:
     void keyPressEvent(QKeyEvent *event) override;
     void keyReleaseEvent(QKeyEvent *event) override;
@@ -41,6 +39,11 @@ private:
     void mouseReleaseEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent *event) override;
     void timerEvent(QTimerEvent *event) override;
+
+    void generateMatrices(SceneCameraData& cameraData);
+    void makeFBO();
+    void paintShapes();
+    void paintTexture(GLuint texture);
 
     // Tick Related Variables
     int m_timer;                                        // Stores timer which attempts to run ~60 times per second
@@ -63,7 +66,7 @@ private:
 
     RenderData metadata;
     GLuint m_shader;
-    GLuint m_invert_shader;
+    GLuint m_texture_shader;
 
     Camera camera;
 
@@ -76,4 +79,12 @@ private:
     bool adaptiveShapes = false;
     bool adaptiveDistance = false;
     glm::vec4 camera_pos;
+
+    GLuint m_defaultFBO;
+    GLuint m_fbo;
+    GLuint m_fbo_texture;
+    GLuint m_fbo_renderbuffer;
+
+    GLuint m_fullscreen_vbo;
+    GLuint m_fullscreen_vao;
 };

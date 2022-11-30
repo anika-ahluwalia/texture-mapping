@@ -44,6 +44,13 @@ void Realtime::finish() {
     gl.cleanMemory();
     glDeleteProgram(m_shader);
 
+    glDeleteVertexArrays(1, &m_fullscreen_vao);
+    glDeleteBuffers(1, &m_fullscreen_vbo);
+
+    glDeleteTextures(1, &m_fbo_texture);
+    glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
+    glDeleteFramebuffers(1, &m_fbo);
+
     this->doneCurrent();
 }
 
@@ -73,23 +80,56 @@ void Realtime::initializeGL() {
     // clearing screen and loading shader
     glClearColor(0, 0, 0, 255);
     m_shader = ShaderLoader::createShaderProgram(":/resources/shaders/default.vert", ":/resources/shaders/default.frag");
-    m_invert_shader = ShaderLoader::createShaderProgram(":/resources/shaders/invert.vert", ":/resources/shaders/invert.frag");
+    m_texture_shader = ShaderLoader::createShaderProgram(":/resources/shaders/texture.vert", ":/resources/shaders/texture.frag");
 
     // load and bind VBOs and VAOs for each shape
     gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
     gl.generateAllShapes();
 
+    std::vector<GLfloat> fullscreen_quad_data =
+      {
+          -1.0f,  1.0f, 0.0f,
+           0.0f,  1.0f,
+          -1.0f, -1.0f, 0.0f,
+           0.0f,  0.0f,
+           1.0f, -1.0f, 0.0f,
+           1.0f,  0.0f,
+           1.0f,  1.0f, 0.0f,
+           1.0f,  1.0f,
+          -1.0f,  1.0f, 0.0f,
+           0.0f,  1.0f,
+           1.0f, -1.0f, 0.0f,
+           1.0f,  0.0f
+      };
+
+      // Generate and bind a VBO and a VAO for a fullscreen quad
+      glGenBuffers(1, &m_fullscreen_vbo);
+      glBindBuffer(GL_ARRAY_BUFFER, m_fullscreen_vbo);
+      glBufferData(GL_ARRAY_BUFFER, fullscreen_quad_data.size()*sizeof(GLfloat), fullscreen_quad_data.data(), GL_STATIC_DRAW);
+      glGenVertexArrays(1, &m_fullscreen_vao);
+      glBindVertexArray(m_fullscreen_vao);
+
+      // Task 14: modify the code below to add a second attribute to the vertex attribute array
+      glEnableVertexAttribArray(0);
+      glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
+      glEnableVertexAttribArray(1);
+      glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat),  reinterpret_cast<void*>(3 * sizeof(GL_FLOAT)));
+      // Unbind the fullscreen quad's VBO and VAO
+      glBindBuffer(GL_ARRAY_BUFFER, 0);
+      glBindVertexArray(0);
+
+      makeFBO();
+
     // setting a flag to let us know that it is initialized
     is_intialized = true;
 }
 
-void Realtime::paintGL() {
+void Realtime::paintShapes() {
+
+    this->makeCurrent();
+    glUseProgram(m_shader);
 
     std::vector<RenderShapeData> shapes = metadata.shapes;
-
-    // clear screen color and depth before painting
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
 
     GLuint vao;
     std::vector<float> shape_data;
@@ -153,22 +193,84 @@ void Realtime::paintGL() {
         glBindVertexArray(0);
         glUseProgram(0);
     }
+
+    glUseProgram(0);
+    this->doneCurrent();
 }
 
-//void Realtime::paintInvert(GLuint texture) {
-//    glUseProgram(m_invert_shader);
-//    glUniform1i(glGetUniformLocation(m_invert_shader, "inverting"), settings.perPixelFilter);
+void Realtime::paintGL() {
 
-//    glBindVertexArray(m_fullscreen_vao);
-//    // Task 10: Bind "texture" to slot 0
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, texture);
+     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
-//    glDrawArrays(GL_TRIANGLES, 0, 6);
-//    glBindTexture(GL_TEXTURE_2D, 0);
-//    glBindVertexArray(0);
-//    glUseProgram(0);
-//}
+     // clear screen color and depth before painting
+     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+     paintShapes();
+
+     // Task 25: Bind the default framebuffer
+     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
+     // Task 26: Clear the color and depth buffers
+     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+     // Task 27: Call paintTexture to draw our FBO color attachment texture | Task 31: Set bool parameter to true
+    // paintTexture(m_fbo_texture);
+
+}
+
+void Realtime::paintTexture(GLuint texture) {
+
+    this->makeCurrent();
+
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "inverting"), settings.perPixelFilter);
+
+    glBindVertexArray(m_fullscreen_vao);
+    // Task 10: Bind "texture" to slot 0
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glBindVertexArray(0);
+
+    glUseProgram(0);
+
+    this->doneCurrent();
+}
+
+void Realtime::makeFBO(){
+    // Task 19: Generate and bind an empty texture, set its min/mag filter interpolation, then unbind
+    glGenTextures(1, &m_fbo_texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Task 20: Generate and bind a renderbuffer of the right size, set its format, then unbind
+    glGenRenderbuffers(1, &m_fbo_renderbuffer);
+    glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
+    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
+    glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+    // Task 18: Generate and bind an FBO
+    glGenFramebuffers(1, &m_fbo);
+    glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
+
+    // Task 21: Add our texture as a color attachment, and our renderbuffer as a depth+stencil attachment, to our FBO
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer);
+
+    // Task 22: Unbind the FBO
+    glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
+
+}
 
 
 void Realtime::resizeGL(int w, int h) {
