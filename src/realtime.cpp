@@ -276,16 +276,16 @@ void Realtime::makeFBO(){
 
 void Realtime::resizeGL(int w, int h) {
 
+    m_fbo_width = size().width();
+    m_fbo_height = size().height();
+    makeFBO();
+
     // Tells OpenGL how big the screen is
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
     // regenerates the camera & projection due to parameter change and re-renders the scene
     generateMatrices(metadata.cameraData);
 
-    m_fbo_width = size().width();
-    m_fbo_height = size().height();
-
-    makeFBO();
     update(); // asks for a PaintGL() call to occur
 }
 
