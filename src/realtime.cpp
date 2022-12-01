@@ -446,10 +446,10 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
         glm::vec3 yAxis = glm::normalize(glm::cross(look, up));
 
         float thetaX = float(deltaX) / float(size().width()) * M_PI / 2.f;
-        look = look * cos(thetaX) + glm::cross(xAxis, look) * sin(thetaX) + xAxis * glm::dot(xAxis, look) * (1 - cos(thetaX));
+        look = look * float(cos(thetaX)) + glm::cross(xAxis, look) * float(sin(thetaX)) + xAxis * glm::dot(xAxis, look) * (1.f - float(cos(thetaX)));
 
         float thetaY = float(deltaY) / float(size().height()) * M_PI / 2.f;
-        look = look * cos(thetaY) + glm::cross(yAxis, look) * sin(thetaY) + yAxis * glm::dot(yAxis, look) * (1 - cos(thetaY));
+        look = look * float(cos(thetaY)) + glm::cross(yAxis, look) * float(sin(thetaY)) + yAxis * glm::dot(yAxis, look) * (1.f - float(cos(thetaY)));
 
         metadata.cameraData.look = glm::vec4(look, 0);
         generateMatrices(metadata.cameraData);
