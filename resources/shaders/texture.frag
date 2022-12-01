@@ -21,9 +21,9 @@ void main()
         float heightInc = 1.f / height;
 
         for (int i = -2; i < 3; i++) {
-            float u = i * widthInc + uvCoordinate[0];
+            float u = min(1, max(0, i * widthInc + uvCoordinate[0]));
             for (int j = -2; j < 3; j++) {
-                float v = j * heightInc + uvCoordinate[1];
+                float v = min(1, max(0,j * heightInc + uvCoordinate[1]));
                 vec2 newUV = vec2(u, v);
                 vec4 newFrag = texture(texture1, newUV);
                 totalFrag += newFrag;
