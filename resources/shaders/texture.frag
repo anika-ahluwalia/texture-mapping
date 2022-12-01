@@ -5,6 +5,9 @@ uniform sampler2D texture1;
 uniform bool inverting;
 uniform bool blurring;
 
+uniform int width;
+uniform int height;
+
 out vec4 fragColor;
 
 void main()
@@ -19,6 +22,21 @@ void main()
 
     if (blurring) {
 
-    }
+        vec4 totalFrag = vec4(0);
 
+        float widthInc = 1.f / width;
+        float heightInc = 1.f / height;
+
+        for (int i = -2; i < 3; i++) {
+            float u = i * widthInc + uvCoordinate[0];
+            for (int j = -2; j < 3; j++) {
+                float v = j * heightInc + uvCoordinate[1];
+                vec2 newUV = vec2(u, v);
+                vec4 newFrag = texture(texture1, newUV);
+                totalFrag += newFrag;
+            }
+        }
+
+        fragColor = totalFrag / 25.f;
+    }
 }

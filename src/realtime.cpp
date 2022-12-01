@@ -206,8 +206,6 @@ void Realtime::paintShapes() {
 }
 
 void Realtime::paintGL() {
-
-
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
@@ -228,9 +226,10 @@ void Realtime::paintGL() {
 void Realtime::paintTexture(GLuint texture) {
     glUseProgram(m_texture_shader);
     glUniform1i(glGetUniformLocation(m_texture_shader, "inverting"), settings.perPixelFilter);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "blurring"), settings.kernelBasedFilter);
 
     glBindVertexArray(m_fullscreen_vao);
-    // Task 10: Bind "texture" to slot 0
+
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texture);
 
@@ -242,6 +241,10 @@ void Realtime::paintTexture(GLuint texture) {
 }
 
 void Realtime::makeFBO(){
+    glUseProgram(m_texture_shader);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "width"), m_fbo_width);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "height"), m_fbo_height);
+    glUseProgram(0);
 
     // Task 19: Generate and bind an empty texture, set its min/mag filter interpolation, then unbind
     glGenTextures(1, &m_fbo_texture);
@@ -272,7 +275,6 @@ void Realtime::makeFBO(){
     // Task 22: Unbind the FBO
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 }
-
 
 void Realtime::resizeGL(int w, int h) {
 
