@@ -14,14 +14,7 @@ void main()
 {
     fragColor = texture(texture1, uvCoordinate);
 
-    if (inverting) {
-        fragColor[0] = 1 - fragColor[0];
-        fragColor[1] = 1 - fragColor[1];
-        fragColor[2] = 1 - fragColor[2];
-    }
-
     if (blurring) {
-
         vec4 totalFrag = vec4(0);
 
         float widthInc = 1.f / width;
@@ -36,7 +29,12 @@ void main()
                 totalFrag += newFrag;
             }
         }
-
         fragColor = totalFrag / 25.f;
+    }
+
+    if (inverting) {
+        fragColor[0] = 1 - fragColor[0];
+        fragColor[1] = 1 - fragColor[1];
+        fragColor[2] = 1 - fragColor[2];
     }
 }
