@@ -111,7 +111,7 @@ void main()
         fragColor[2] = newColor;
     }
 
-    // brightening filter -- EXTRA CREDIT
+    // sepia filter -- EXTRA CREDIT
     if (sepia) {
         float red = (fragColor[0] * .393) + (fragColor[1] *.769) + (fragColor[2] * .189);
         float green = (fragColor[0] * .349) + (fragColor[1] *.686) + (fragColor[2] * .168);

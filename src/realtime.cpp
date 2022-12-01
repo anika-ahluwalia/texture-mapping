@@ -56,9 +56,8 @@ void Realtime::finish() {
 }
 
 void Realtime::initializeGL() {
-    m_devicePixelRatio = this->devicePixelRatio();
-
     m_defaultFBO = 2;
+    m_devicePixelRatio = this->devicePixelRatio();
 
     m_fbo_width = size().width();
     m_fbo_height = size().height();
@@ -458,10 +457,10 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
         glm::vec3 xAxis = glm::vec3 {0, 1, 0};
         glm::vec3 yAxis = glm::normalize(glm::cross(look, up));
 
-        float thetaX = float(deltaX) / float(size().width()) * M_PI;
+        float thetaX = float(deltaX) / float(size().width()) * M_PI / 2.f;
         look = look * cos(thetaX) + glm::cross(xAxis, look) * sin(thetaX) + xAxis * glm::dot(xAxis, look) * (1 - cos(thetaX));
 
-        float thetaY = float(deltaY) / float(size().height()) * M_PI;
+        float thetaY = float(deltaY) / float(size().height()) * M_PI / 2.f;
         look = look * cos(thetaY) + glm::cross(yAxis, look) * sin(thetaY) + yAxis * glm::dot(yAxis, look) * (1 - cos(thetaY));
 
         metadata.cameraData.look = glm::vec4(look, 0);

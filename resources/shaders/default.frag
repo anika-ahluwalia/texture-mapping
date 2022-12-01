@@ -7,7 +7,6 @@ out vec4 fragColor;
 
 uniform int numLights;
 
-// is int the best way to represent this?
 // 0 = directional light
 // 1 = point light
 // 2 = spot light

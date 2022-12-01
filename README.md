@@ -1,15 +1,22 @@
 # Projects 6: Action!
 
 ### Design Choices
-blah blah
+Default FBO is stored in the variable m_defaultFBO in the Realtime class. It can be quickly changed 
+on line 59 of Realtime.cpp (first line of initializeGL).
+
+
 
 ### Known Bugs
 No known bugs.
 
 ### Extra Credit
-Extra Credit #3: Grayscale per-pixel filter.
+Extra Credit #3: Grayscale per-pixel filter. All relevant code is in resources/shaders/texture.frag
 
-Extra Credit #4: Sharpening kernel filter.
+Extra Credit #4: Sharpening kernel filter. All relevant code is in resources/shaders/texture.frag
+
+Extra Credit #5: Sepia per-pixel filter. All relevant code is in resources/shaders/texture.frag
+
+Extra Credit #6: Edge detection kernel filter. All relevant code is in resources/shaders/texture.frag
 
 
 
