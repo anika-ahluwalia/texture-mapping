@@ -87,4 +87,6 @@ private:
 
     GLuint m_fullscreen_vbo;
     GLuint m_fullscreen_vao;
+    int m_fbo_width;
+    int m_fbo_height;
 };
