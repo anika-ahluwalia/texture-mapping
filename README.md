@@ -4,6 +4,21 @@
 Default FBO is stored in the variable m_defaultFBO in the Realtime class. It can be quickly changed 
 on line 59 of Realtime.cpp (first line of initializeGL).
 
+For this project, I began by adjusting my default shader that was being used for lighting to include
+point and directional lights. The main changes with this adjustment were passing in more uniform variables
+to the fragment shader so that it could handle these types of lights. After that, the rest of the light
+calculations were fairly simple and all handled in default.frag.
+
+Next, I worked on getting movement to work. The code for this is essentially all in the mouseMoveEvent 
+and timerEvent functions in realtime.cpp. For keyboard movement, I only modified the position vector and
+for rotation, I only modified the look vector. Each time one of these was modified, I created a new
+camera, recalculated the matrices, and updated the uniforms that were passed in.
+
+Finally, I worked on the framebuffer portion. I created a new texture shader that would handle all of 
+the post processing effects. I created a color and renderbuffer attachment and updated them accordingly
+in my code. I passed in the original rendering's colors in as a texture into the fragment shader, and 
+then did all of the post processing within texture.frag. I mapped neighboring UV coordinates by finding 
+the width and height pixel increments scaled down and adding and subtracting those.
 
 
 ### Known Bugs

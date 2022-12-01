@@ -118,7 +118,6 @@ void Realtime::initializeGL() {
     glGenVertexArrays(1, &m_fullscreen_vao);
     glBindVertexArray(m_fullscreen_vao);
 
-    // Task 14: modify the code below to add a second attribute to the vertex attribute array
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), nullptr);
     glEnableVertexAttribArray(1);
@@ -208,17 +207,14 @@ void Realtime::paintGL() {
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
     glViewport(0, 0, size().width() * m_devicePixelRatio, size().height() * m_devicePixelRatio);
 
-    // clear screen color and depth before painting
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     paintShapes();
 
-    // Task 25: Bind the default framebuffer
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // Task 27: Call paintTexture to draw our FBO color attachment texture | Task 31: Set bool parameter to true
     paintTexture(m_fbo_texture);
 }
 
@@ -251,7 +247,6 @@ void Realtime::makeFBO(){
     glUniform1i(glGetUniformLocation(m_texture_shader, "height"), m_fbo_height);
     glUseProgram(0);
 
-    // Task 19: Generate and bind an empty texture, set its min/mag filter interpolation, then unbind
     glGenTextures(1, &m_fbo_texture);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_fbo_texture);
@@ -263,21 +258,17 @@ void Realtime::makeFBO(){
 
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    // Task 20: Generate and bind a renderbuffer of the right size, set its format, then unbind
     glGenRenderbuffers(1, &m_fbo_renderbuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, m_fbo_renderbuffer);
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8,m_fbo_width * m_devicePixelRatio, m_fbo_height * m_devicePixelRatio);
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
-    // Task 18: Generate and bind an FBO
     glGenFramebuffers(1, &m_fbo);
     glBindFramebuffer(GL_FRAMEBUFFER, m_fbo);
 
-    // Task 21: Add our texture as a color attachment, and our renderbuffer as a depth+stencil attachment, to our FBO
     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_fbo_texture, 0);
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_fbo_renderbuffer);
 
-    // Task 22: Unbind the FBO
     glBindFramebuffer(GL_FRAMEBUFFER, m_defaultFBO);
 }
 
@@ -331,8 +322,6 @@ void Realtime::sceneChanged() {
     // passing in light colors and directions
     for (int i = 0; i < fmin(metadata.lights.size(), 8); i++) {
         SceneLightData light = metadata.lights[i];
-
-        // modify empties ?? (ex. direction for point & spot light)
 
         std::string type_pos = "lightTypes[" + std::to_string(i) + "]";
         GLint type_loc = glGetUniformLocation(m_shader, type_pos.c_str());
@@ -450,7 +439,6 @@ void Realtime::mouseMoveEvent(QMouseEvent *event) {
         int deltaY = posY - m_prev_mouse_pos.y;
         m_prev_mouse_pos = glm::vec2(posX, posY);
 
-        // Use deltaX and deltaY here to rotate
         glm::vec3 look = metadata.cameraData.look;
         glm::vec3 up = metadata.cameraData.up;
 
@@ -475,45 +463,45 @@ void Realtime::timerEvent(QTimerEvent *event) {
     float deltaTime = elapsedms * 0.001f;
     m_elapsedTimer.restart();
 
+    // storing if anything should be changed or not
     bool changeFlag = false;
     glm::vec3 translation_vec = glm::vec3 {0,0,0};
 
-    // change position vector for translation
     glm::vec3 look = metadata.cameraData.look;
     glm::vec3 up = metadata.cameraData.up;
 
     if (m_keyMap[Qt::Key_W]) {
-        translation_vec = 5.f * deltaTime * glm::normalize(look);
+        translation_vec = glm::normalize(look);
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_S]) {
-        translation_vec = -5.f * deltaTime * glm::normalize(look);
+        translation_vec = -1.f * glm::normalize(look);
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_A]) {
-        translation_vec = -5.f * deltaTime * glm::normalize(glm::cross(look, up));
+        translation_vec = -1.f * glm::normalize(glm::cross(look, up));
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_D]) {
-        translation_vec = 5.f * deltaTime * glm::normalize(glm::cross(look, up));
+        translation_vec = glm::normalize(glm::cross(look, up));
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_Space]) {
-        translation_vec = 5.f * deltaTime * glm::vec3 {0, 1, 0};
+        translation_vec =glm::vec3 {0, 1, 0};
         changeFlag = true;
     }
 
     if (m_keyMap[Qt::Key_Control] || m_keyMap[Qt::Key_Meta]) {
-        translation_vec = 5.f * deltaTime * glm::vec3 {0, -1, 0};
+        translation_vec = glm::vec3 {0, -1, 0};
         changeFlag = true;
     }
 
     if (changeFlag) {
-        metadata.cameraData.pos = metadata.cameraData.pos + glm::vec4(translation_vec, 0);
+        metadata.cameraData.pos = metadata.cameraData.pos + 5.f * deltaTime * glm::vec4(translation_vec, 0);
         generateMatrices(metadata.cameraData);
     }
 

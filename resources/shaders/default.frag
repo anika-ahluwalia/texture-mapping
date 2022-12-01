@@ -70,9 +70,6 @@ void main() {
         }
 
         // adjusting if it is a spot light
-
-        // maybe just pass in falloff so its only calculated once?
-        // don't pass in angles and penumbras
         if (lightTypes[i] == 2) {
             vec3 lightToPosition = normalize(worldSpacePos - vec3(lightPositions[i]));
             vec3 direction = normalize(lightDirections[i]);

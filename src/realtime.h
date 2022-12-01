@@ -80,6 +80,7 @@ private:
     bool adaptiveDistance = false;
     glm::vec4 camera_pos;
 
+    // action additions
     GLuint m_defaultFBO;
     GLuint m_fbo;
     GLuint m_fbo_texture;
