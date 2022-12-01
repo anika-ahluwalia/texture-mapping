@@ -157,6 +157,14 @@ void MainWindow::initialize() {
     ec4->setText(QStringLiteral("Extra Credit 4"));
     ec4->setChecked(false);
 
+    ec5 = new QCheckBox();
+    ec5->setText(QStringLiteral("Extra Credit 5"));
+    ec5->setChecked(false);
+
+    ec6 = new QCheckBox();
+    ec6->setText(QStringLiteral("Extra Credit 6"));
+    ec6->setChecked(false);
+
     vLayout->addWidget(uploadFile);
     vLayout->addWidget(tesselation_label);
     vLayout->addWidget(param1_label);
@@ -177,6 +185,8 @@ void MainWindow::initialize() {
     vLayout->addWidget(ec2);
     vLayout->addWidget(ec3);
     vLayout->addWidget(ec4);
+    vLayout->addWidget(ec5);
+    vLayout->addWidget(ec6);
 
     connectUIElements();
 
@@ -246,6 +256,8 @@ void MainWindow::connectExtraCredit() {
     connect(ec2, &QCheckBox::clicked, this, &MainWindow::onExtraCredit2);
     connect(ec3, &QCheckBox::clicked, this, &MainWindow::onExtraCredit3);
     connect(ec4, &QCheckBox::clicked, this, &MainWindow::onExtraCredit4);
+    connect(ec5, &QCheckBox::clicked, this, &MainWindow::onExtraCredit5);
+    connect(ec6, &QCheckBox::clicked, this, &MainWindow::onExtraCredit6);
 }
 
 void MainWindow::onPerPixelFilter() {
@@ -335,5 +347,15 @@ void MainWindow::onExtraCredit3() {
 
 void MainWindow::onExtraCredit4() {
     settings.extraCredit4 = !settings.extraCredit4;
+    realtime->settingsChanged();
+}
+
+void MainWindow::onExtraCredit5() {
+    settings.extraCredit5 = !settings.extraCredit5;
+    realtime->settingsChanged();
+}
+
+void MainWindow::onExtraCredit6() {
+    settings.extraCredit6 = !settings.extraCredit6;
     realtime->settingsChanged();
 }

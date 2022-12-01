@@ -2,11 +2,15 @@
 in vec2 uvCoordinate;
 
 uniform sampler2D texture1;
+
 uniform bool inverting;
 uniform bool blurring;
 
 uniform bool grayscale;
+uniform bool brightening;
+
 uniform bool sharpening;
+uniform bool another;
 
 uniform int width;
 uniform int height;
@@ -17,6 +21,7 @@ void main()
 {
     fragColor = texture(texture1, uvCoordinate);
 
+    // blurring filter
     if (blurring) {
         vec4 totalFrag = vec4(0);
 
@@ -35,6 +40,7 @@ void main()
         fragColor = totalFrag / 25.f;
     }
 
+    // sharpening filter -- EXTRA CREDIT
     if (sharpening) {
         vec4 totalFrag = vec4(0);
 
@@ -57,16 +63,25 @@ void main()
         fragColor = totalFrag / 9.f;
     }
 
+    // inverting filter
     if (inverting) {
         fragColor[0] = 1 - fragColor[0];
         fragColor[1] = 1 - fragColor[1];
         fragColor[2] = 1 - fragColor[2];
     }
 
+    // grayscale filter -- EXTRA CREDIT
     if (grayscale) {
         float newColor = (fragColor[0] + fragColor[1] + fragColor[2]) / 3.f;
         fragColor[0] = newColor;
         fragColor[1] = newColor;
         fragColor[2] = newColor;
+    }
+
+    if (brightening) {
+        float brightFactor = 0.1;
+        fragColor[0] = min(1, fragColor[0] + brightFactor);
+        fragColor[1] = min(1, fragColor[1] + brightFactor);
+        fragColor[2] = min(1, fragColor[2] + brightFactor);
     }
 }

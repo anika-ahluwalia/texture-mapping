@@ -1,3 +1,18 @@
+# Projects 6: Action!
+
+### Design Choices
+blah blah
+
+### Known Bugs
+No known bugs.
+
+### Extra Credit
+Extra Credit #3: Grayscale per-pixel filter.
+
+Extra Credit #4: Sharpening kernel filter.
+
+
+
 # Projects 5: Lights, Camera
 
 ### Design Choices
