@@ -10,7 +10,7 @@ uniform bool grayscale;
 uniform bool brightening;
 
 uniform bool sharpening;
-uniform bool another;
+uniform bool edgeDetect;
 
 uniform int width;
 uniform int height;
@@ -63,6 +63,39 @@ void main()
         fragColor = totalFrag / 9.f;
     }
 
+    // edge detetction filter -- EXTRA CREDIT
+    if (edgeDetect) {
+        vec4 totalFrag = vec4(0);
+
+        vec3 kernel = vec3(1, 2, 1);
+
+        float widthInc = 1.f / width;
+        float heightInc = 1.f / height;
+
+        for (int i = -1; i < 2; i++) {
+            float u = min(1, max(0, i * widthInc + uvCoordinate[0]));
+            for (int j = -1; j < 2; j++) {
+                float v = min(1, max(0,j * heightInc + uvCoordinate[1]));
+                vec2 newUV = vec2(u, v);
+                vec4 newFrag = texture(texture1, newUV);
+
+                float weight = 0.f;
+                if (i == 0) {
+                    if (j == 0) {
+                        weight = 4.f;
+                    } else {
+                        weight = -1.f;
+                    }
+                } else if (j == 0) {
+                    weight = -1.f;
+                }
+
+                totalFrag += newFrag * weight;
+            }
+        }
+        fragColor = totalFrag;
+    }
+
     // inverting filter
     if (inverting) {
         fragColor[0] = 1 - fragColor[0];
@@ -78,6 +111,7 @@ void main()
         fragColor[2] = newColor;
     }
 
+    // brightening filter -- EXTRA CREDIT
     if (brightening) {
         float brightFactor = 0.1;
         fragColor[0] = min(1, fragColor[0] + brightFactor);
