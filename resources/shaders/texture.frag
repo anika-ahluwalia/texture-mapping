@@ -7,7 +7,7 @@ uniform bool inverting;
 uniform bool blurring;
 
 uniform bool grayscale;
-uniform bool brightening;
+uniform bool sepia;
 
 uniform bool sharpening;
 uniform bool edgeDetect;
@@ -112,10 +112,12 @@ void main()
     }
 
     // brightening filter -- EXTRA CREDIT
-    if (brightening) {
-        float brightFactor = 0.1;
-        fragColor[0] = min(1, fragColor[0] + brightFactor);
-        fragColor[1] = min(1, fragColor[1] + brightFactor);
-        fragColor[2] = min(1, fragColor[2] + brightFactor);
+    if (sepia) {
+        float red = (fragColor[0] * .393) + (fragColor[1] *.769) + (fragColor[2] * .189);
+        float green = (fragColor[0] * .349) + (fragColor[1] *.686) + (fragColor[2] * .168);
+        float blue = (fragColor[0] * .272) + (fragColor[1] *.534) + (fragColor[2] * .131);
+        fragColor[0] = red;
+        fragColor[1] = green;
+        fragColor[2] = blue;
     }
 }

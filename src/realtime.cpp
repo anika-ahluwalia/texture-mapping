@@ -231,7 +231,7 @@ void Realtime::paintTexture(GLuint texture) {
     glUniform1i(glGetUniformLocation(m_texture_shader, "grayscale"), settings.extraCredit3);
     glUniform1i(glGetUniformLocation(m_texture_shader, "sharpening"), settings.extraCredit4);
 
-    glUniform1i(glGetUniformLocation(m_texture_shader, "brightening"), settings.extraCredit5);
+    glUniform1i(glGetUniformLocation(m_texture_shader, "sepia"), settings.extraCredit5);
     glUniform1i(glGetUniformLocation(m_texture_shader, "edgeDetect"), settings.extraCredit6);
 
     glBindVertexArray(m_fullscreen_vao);
