@@ -13,7 +13,7 @@ public:
     GLHelper(int param1, int param2);
     void cleanMemory();
     void createVAOVBO(GLuint &vbo, GLuint &vao, std::vector<float> shape_data);
-    void generateBuilding(int size, int height);
+    void generateBuilding(int size, int height, float x, float z);
     GLuint building_vbo;
     GLuint building_vao;
     std::vector<float> building_data;

@@ -91,7 +91,7 @@ void Realtime::initializeGL() {
 
     // load and bind VBOs and VAOs for each shape
     gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
-    gl.generateBuilding(1, 2);
+    gl.generateBuilding(2, 1, -1.f, -1.f);
 
 
 
@@ -301,6 +301,16 @@ void Realtime::sceneChanged() {
     // loading in the scene data
     SceneParser::parse(settings.sceneFilePath, metadata);
     // generating new matrices (because camera data could have changed)
+
+//    metadata.cameraData = SceneCameraData{
+//            glm::vec4(0, 0, 0, 1),
+//            glm::vec4(1, 0, 0, 0),
+//            glm::vec4(0, 1, 0, 0),
+//            30
+//    };
+
+
+
     generateMatrices(metadata.cameraData);
 
     this->makeCurrent();
@@ -368,7 +378,7 @@ void Realtime::settingsChanged() {
             adaptiveShapes = true;
             int param = fmax(fmin(40 / metadata.shapes.size(), 25), 3);
             gl = GLHelper(param, param);
-            gl.generateBuilding(1, 2);
+            gl.generateBuilding(1, 2, 1, 1);
         }
         if (settings.extraCredit2 && !adaptiveDistance) {
             adaptiveDistance = true;
@@ -381,7 +391,7 @@ void Realtime::settingsChanged() {
                 gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
                 param1 = settings.shapeParameter1;
                 param2 = settings.shapeParameter2;
-                gl.generateBuilding(1, 2);
+                gl.generateBuilding(1, 2, 1, 1);
             }
         }
 

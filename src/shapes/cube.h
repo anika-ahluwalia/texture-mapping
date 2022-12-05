@@ -6,7 +6,7 @@
 class Cube
 {
 public:
-    void updateParams(int param1, float x, float y, float z);
+    void updateParams(int param1, float x, float y, float z, int texture);
     std::vector<float> generateShape() { return m_vertexData; }
 
 private:
@@ -27,4 +27,5 @@ private:
     float m_x;
     float m_y;
     float m_z;
+    int m_texture;
 };
