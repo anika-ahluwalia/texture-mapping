@@ -12,22 +12,11 @@ class GLHelper
 public:
     GLHelper(int param1, int param2);
     void cleanMemory();
-    void generateAllShapes();
-    void makeOneShape(PrimitiveType type, int param1, int param2);
     void createVAOVBO(GLuint &vbo, GLuint &vao, std::vector<float> shape_data);
-
-    GLuint cube_vbo;       //Stores id for cube vbo
-    GLuint cube_vao;       //Stores id for cube vao
-    std::vector<float> cube_data;
-    GLuint sphere_vbo;     //Stores id for sphere vbo
-    GLuint sphere_vao;     //Stores id for sphere vao
-    std::vector<float> sphere_data;
-    GLuint cylinder_vbo;   //Stores id for cylinder vbo
-    GLuint cylinder_vao;   //Stores id for cylinder vao
-    std::vector<float> cylinder_data;
-    GLuint cone_vbo;       //Stores id for cone vbo
-    GLuint cone_vao;       //Stores id for cone vao
-    std::vector<float> cone_data;
+    void generateBuilding(int size, int height);
+    GLuint building_vbo;
+    GLuint building_vao;
+    std::vector<float> building_data;
 
 private:
     int m_param1;

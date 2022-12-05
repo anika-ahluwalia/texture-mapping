@@ -90,4 +90,7 @@ private:
     GLuint m_fullscreen_vao;
     int m_fbo_width;
     int m_fbo_height;
+
+    QImage m_image;
+    GLuint m_brick_texture;
 };

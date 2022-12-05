@@ -5,6 +5,7 @@
 #include "shapes/sphere.h"
 #include "shapes/cylinder.h"
 #include "shapes/cone.h"
+#include "shapes/building.h"
 
 #include <GL/glew.h>
 
@@ -15,21 +16,16 @@ GLHelper::GLHelper(int param1, int param2)
 }
 
 void GLHelper::cleanMemory() {
-    glDeleteBuffers(1, &cube_vbo);
-    glDeleteVertexArrays(1, &cube_vao);
-    glDeleteBuffers(1, &sphere_vbo);
-    glDeleteVertexArrays(1, &sphere_vao);
-    glDeleteBuffers(1, &cylinder_vbo);
-    glDeleteVertexArrays(1, &cylinder_vao);
-    glDeleteBuffers(1, &cone_vbo);
-    glDeleteVertexArrays(1, &cone_vao);
+    glDeleteBuffers(1, &building_vbo);
+    glDeleteVertexArrays(1, &building_vao);
 }
 
-void GLHelper::generateAllShapes() {
-    makeOneShape(PrimitiveType::PRIMITIVE_CUBE, m_param1, m_param2);
-    makeOneShape(PrimitiveType::PRIMITIVE_CONE, m_param1, m_param2);
-    makeOneShape(PrimitiveType::PRIMITIVE_CYLINDER, m_param1, m_param2);
-    makeOneShape(PrimitiveType::PRIMITIVE_SPHERE, m_param1, m_param2);
+
+void GLHelper::generateBuilding(int size, int height) {
+    Building building = Building();
+    building.updateParams(m_param1, size, height);
+    building_data = building.generate();
+    createVAOVBO(building_vbo, building_vao, building_data);
 }
 
 void GLHelper::createVAOVBO(GLuint &vbo, GLuint &vao, std::vector<float> shape_data) {
@@ -45,43 +41,12 @@ void GLHelper::createVAOVBO(GLuint &vbo, GLuint &vao, std::vector<float> shape_d
     // Setting position and normal attributes
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 6, reinterpret_cast<void*>(3 * sizeof(GL_FLOAT)));
+    glEnableVertexAttribArray(2);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(3 * sizeof(GL_FLOAT)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(6 * sizeof(GL_FLOAT)));
 
     // unbinding
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-}
-
-void GLHelper::makeOneShape(PrimitiveType type, int param1, int param2) {
-    switch (type) {
-        case PrimitiveType::PRIMITIVE_CUBE: {
-            Cube cube = Cube();
-            cube.updateParams(param1);
-            cube_data = cube.generateShape();
-            createVAOVBO(cube_vbo, cube_vao, cube_data);
-            break;
-        }
-        case PrimitiveType::PRIMITIVE_CONE: {
-            Cone cone = Cone();
-            cone.updateParams(m_param1, std::max(param2, 3));
-            cone_data = cone.generateShape();
-            createVAOVBO(cone_vbo, cone_vao, cone_data);
-            break;
-        }
-        case PrimitiveType::PRIMITIVE_SPHERE: {
-            Sphere sphere = Sphere();
-            sphere.updateParams(std::max(param1, 2), std::max(param2, 3));
-            sphere_data = sphere.generateShape();
-            createVAOVBO(sphere_vbo, sphere_vao, sphere_data);
-            break;
-        }
-        case PrimitiveType::PRIMITIVE_CYLINDER: {
-            Cylinder cylinder = Cylinder();
-            cylinder.updateParams(param1, std::max(param2, 3));
-            cylinder_data = cylinder.generateShape();
-            createVAOVBO(cylinder_vbo, cylinder_vao, cylinder_data);
-            break;
-        }
-    }
 }

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 
 # Sets project name
-project(projects_realtime LANGUAGES CXX C)
+project(fp-playground LANGUAGES CXX C)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -51,6 +51,9 @@ add_executable(${PROJECT_NAME}
     src/shapes/sphere.cpp
     src/shapes/cylinder.h
     src/shapes/cylinder.cpp
+
+    src/shapes/building.h
+    src/shapes/building.cpp
 
     src/camera/camera.h
     src/camera/camera.cpp

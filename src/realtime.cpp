@@ -52,6 +52,8 @@ void Realtime::finish() {
     glDeleteRenderbuffers(1, &m_fbo_renderbuffer);
     glDeleteFramebuffers(1, &m_fbo);
 
+    glDeleteTextures(1, &m_brick_texture);
+
     this->doneCurrent();
 }
 
@@ -89,7 +91,24 @@ void Realtime::initializeGL() {
 
     // load and bind VBOs and VAOs for each shape
     gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
-    gl.generateAllShapes();
+    gl.generateBuilding(1, 2);
+
+
+
+    QString brick_filepath = QString("/Users/anikaahluwalia/Desktop/cs1230/lab11-textures-FBOs-anika-ahluwalia/resources/images/kitten.png");
+    m_image = QImage(brick_filepath);
+    m_image = m_image.convertToFormat(QImage::Format_RGBA8888).mirrored();
+    glGenTextures(1, &m_brick_texture);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_brick_texture);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_image.width(), m_image.height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, m_image.bits());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glUseProgram(m_shader);
+    glUniform1i(glGetUniformLocation(m_shader, "texture1"), 0);
+    glUseProgram(0);
 
     glUseProgram(m_texture_shader);
     glUniform1i(glGetUniformLocation(m_texture_shader, "texture1"), 0);
@@ -133,72 +152,42 @@ void Realtime::initializeGL() {
 }
 
 void Realtime::paintShapes() {
+
+    GLuint vao = gl.building_vao;
+    std::vector<float> shape_data = gl.building_data;
+
+    // binding vao and shader
+    glBindVertexArray(vao);
     glUseProgram(m_shader);
 
-    std::vector<RenderShapeData> shapes = metadata.shapes;
+    // passing in uniforms specific to this primitive
+    glm::mat4 ctm = {1.0, 0.0, 0.0, 0.0,
+                     0.0, 1.0, 0.0, 0.0,
+                     0.0, 0.0, 1.0, 0.0,
+                     0.0, 0.0, 0.0, 1.0 };
+    glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &ctm[0][0]);
+    glUniformMatrix3fv(glGetUniformLocation(m_shader, "invTpModelMatrix"), 1, GL_FALSE, &glm::inverse(glm::transpose(glm::mat3(ctm)))[0][0]);
 
-    GLuint vao;
-    std::vector<float> shape_data;
+    glm::vec4 ambient = metadata.globalData.ka * glm::vec4{1.f, 1.f, 1.f, 1.f};
+    glUniform4fv(glGetUniformLocation(m_shader, "ambient"), 1, &ambient[0]);
+    glm::vec4 diffuse = metadata.globalData.kd * glm::vec4{0.f, 1.f, 1.f, 1.f};
+    glUniform4fv(glGetUniformLocation(m_shader, "diffuseCoefficients"), 1, &diffuse[0]);
+    glm::vec4 specular = metadata.globalData.ks * glm::vec4{1.f, 1.f, 1.f, 1.f};
+    glUniform4fv(glGetUniformLocation(m_shader, "specularCoefficients"), 1, &specular[0]);
 
-    // looping through each primitive in the scene
-    for (int index = 0; index < shapes.size(); index++) {
+    glUniform1f(glGetUniformLocation(m_shader, "shininess"), 25.f);
 
-        if (settings.extraCredit2) {
-            glm::vec4 objectMiddle = glm::vec4{0.f, 0.f, 0.f, 1.f};
-            glm::vec4 objectInWorldSpace = shapes[index].ctm * objectMiddle;
-            float distance = glm::length(objectInWorldSpace - camera_pos);
-            int param = fmax(fmin(80 / distance, 25), 3);
-            gl.makeOneShape(shapes[index].primitive.type, param, param);
-        }
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, m_brick_texture);
 
-        // setting vao and shape data based on the type of the primitive
-        switch (shapes[index].primitive.type) {
-        case PrimitiveType::PRIMITIVE_CUBE: {
-            vao = gl.cube_vao;
-            shape_data = gl.cube_data;
-            break;
-        }
-        case PrimitiveType::PRIMITIVE_CONE: {
-            vao = gl.cone_vao;
-            shape_data = gl.cone_data;
-            break;
-        }
-        case PrimitiveType::PRIMITIVE_SPHERE: {
-            vao = gl.sphere_vao;
-            shape_data = gl.sphere_data;
-            break;
-        }
-        case PrimitiveType::PRIMITIVE_CYLINDER: {
-            vao = gl.cylinder_vao;
-            shape_data = gl.cylinder_data;
-            break;
-        }
-        }
+    // drawing!!
+    glDrawArrays(GL_TRIANGLES, 0, shape_data.size() / 3);
 
-        // binding vao and shader
-        glBindVertexArray(vao);
-        glUseProgram(m_shader);
+    // unbinding vao and shader
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
 
-        // passing in uniforms specific to this primitive
-        glUniformMatrix4fv(glGetUniformLocation(m_shader, "modelMatrix"), 1, GL_FALSE, &shapes[index].ctm[0][0]);
-        glUniformMatrix3fv(glGetUniformLocation(m_shader, "invTpModelMatrix"), 1, GL_FALSE, &glm::inverse(glm::transpose(glm::mat3(shapes[index].ctm)))[0][0]);
-
-        glm::vec4 ambient = metadata.globalData.ka * shapes[index].primitive.material.cAmbient;
-        glUniform4fv(glGetUniformLocation(m_shader, "ambient"), 1, &ambient[0]);
-        glm::vec4 diffuse = metadata.globalData.kd * shapes[index].primitive.material.cDiffuse;
-        glUniform4fv(glGetUniformLocation(m_shader, "diffuseCoefficients"), 1, &diffuse[0]);
-        glm::vec4 specular = metadata.globalData.ks * shapes[index].primitive.material.cSpecular;
-        glUniform4fv(glGetUniformLocation(m_shader, "specularCoefficients"), 1, &specular[0]);
-
-        glUniform1f(glGetUniformLocation(m_shader, "shininess"), shapes[index].primitive.material.shininess);
-
-        // drawing!!
-        glDrawArrays(GL_TRIANGLES, 0, shape_data.size() / 3);
-
-        // unbinding vao and shader
-        glBindVertexArray(0);
-        glUseProgram(0);
-    }
+    glUseProgram(0);
 
     glUseProgram(0);
 }
@@ -215,7 +204,7 @@ void Realtime::paintGL() {
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    paintTexture(m_fbo_texture);
+   paintTexture(m_fbo_texture);
 }
 
 void Realtime::paintTexture(GLuint texture) {
@@ -235,6 +224,7 @@ void Realtime::paintTexture(GLuint texture) {
     glBindTexture(GL_TEXTURE_2D, texture);
 
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
     glBindTexture(GL_TEXTURE_2D, 0);
     glBindVertexArray(0);
 
@@ -357,7 +347,6 @@ void Realtime::sceneChanged() {
     if (settings.extraCredit1) {
         int param = 25 / metadata.shapes.size();
         gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
-        gl.generateAllShapes();
     }
 
     glUseProgram(0);
@@ -379,7 +368,7 @@ void Realtime::settingsChanged() {
             adaptiveShapes = true;
             int param = fmax(fmin(40 / metadata.shapes.size(), 25), 3);
             gl = GLHelper(param, param);
-            gl.generateAllShapes();
+            gl.generateBuilding(1, 2);
         }
         if (settings.extraCredit2 && !adaptiveDistance) {
             adaptiveDistance = true;
@@ -390,9 +379,9 @@ void Realtime::settingsChanged() {
                 adaptiveShapes = false;
                 // adaptiveDistance = false;
                 gl = GLHelper(settings.shapeParameter1, settings.shapeParameter2);
-                gl.generateAllShapes();
                 param1 = settings.shapeParameter1;
                 param2 = settings.shapeParameter2;
+                gl.generateBuilding(1, 2);
             }
         }
 
