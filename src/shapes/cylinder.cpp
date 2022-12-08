@@ -24,6 +24,10 @@ void Cylinder::makeTile(glm::vec3 topLeft,
     glm::vec2 bottomLeftTexture = glm::vec2{bottomLeft[0] + 0.5f, bottomLeft[2] + 0.5f};
     glm::vec2 bottomRightTexture = glm::vec2{bottomRight[0] + 0.5f, bottomRight[2] + 0.5f};
     glm::vec2 topRightTexture = glm::vec2{topRight[0] + 0.5f, topRight[2] + 0.5f};
+//    glm::vec2 topLeftTexture = glm::vec2{0.f, 1.f};
+//    glm::vec2 bottomLeftTexture = glm::vec2{0.f, 0.f};
+//    glm::vec2 bottomRightTexture = glm::vec2{1.f, 0.f};
+//    glm::vec2 topRightTexture = glm::vec2{1.f, 1.f};
     if (cap == 0) {
         topLeftNorm = glm::normalize(glm::vec3(topLeft.x, 0, topLeft.z));
         bottomLeftNorm = glm::normalize(glm::vec3(bottomLeft.x, 0, bottomLeft.z));
@@ -53,11 +57,11 @@ void Cylinder::makeTile(glm::vec3 topLeft,
     insertVec2(m_vertexData, bottomLeftTexture);
     insertVec3(m_vertexData, topRight);
     insertVec3(m_vertexData, topRightNorm);
-    insertVec2(m_vertexData, topRightNorm);
+    insertVec2(m_vertexData, topRightTexture);
 
     insertVec3(m_vertexData, topRight);
     insertVec3(m_vertexData, topRightNorm);
-    insertVec2(m_vertexData, topRightNorm);
+    insertVec2(m_vertexData, topRightTexture);
     insertVec3(m_vertexData, bottomLeft);
     insertVec3(m_vertexData, bottomLeftNorm);
     insertVec2(m_vertexData, bottomLeftTexture);
@@ -86,7 +90,7 @@ void Cylinder::setVertexData() {
         float currentTheta = i * thetaStep;
         float nextTheta = currentTheta + thetaStep;
         for (int j = 0; j < param1; j++) {
-            float currentY = j * yStep - 0.5f;
+            float currentY = j * yStep - m_y;
             float nextY = currentY + yStep;
             float currentR = j * rStep + 0.5f;
             float nextR = currentR + rStep;
