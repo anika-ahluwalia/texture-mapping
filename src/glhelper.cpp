@@ -6,6 +6,7 @@
 #include "shapes/cylinder.h"
 #include "shapes/cone.h"
 #include "shapes/building.h"
+#include "shapes/tieredbuilding.h"
 
 #include <GL/glew.h>
 
@@ -23,9 +24,14 @@ void GLHelper::cleanMemory() {
 
 void GLHelper::generateBuilding(int size, int height, float x, float z) {
     Building building = Building();
-    building.updateParams(m_param1, size, height, x, z, 1);
-    building_data = building.generate();
+    building.updateParams(20, 20, 5, 2, 1, 1, 3);
+    building_data = building.getMesh();
     createVAOVBO(building_vbo, building_vao, building_data);
+
+//    TieredBuilding building = TieredBuilding();
+//    building.updateParams(1, 2, 5, 1, x, z, 1);
+//    building_data = building.getMesh();
+//    createVAOVBO(building_vbo, building_vao, building_data);
 }
 
 void GLHelper::createVAOVBO(GLuint &vbo, GLuint &vao, std::vector<float> shape_data) {
@@ -42,11 +48,9 @@ void GLHelper::createVAOVBO(GLuint &vbo, GLuint &vao, std::vector<float> shape_d
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     glEnableVertexAttribArray(2);
-    glEnableVertexAttribArray(3);
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, 0);
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(3 * sizeof(GL_FLOAT)));
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(6 * sizeof(GL_FLOAT)));
-    glVertexAttribPointer(3, 1, GL_FLOAT, GL_FALSE, sizeof(float) * 9, reinterpret_cast<void*>(8 * sizeof(GL_FLOAT)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, 0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(3 * sizeof(GL_FLOAT)));
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 8, reinterpret_cast<void*>(6 * sizeof(GL_FLOAT)));
 
     // unbinding
     glBindBuffer(GL_ARRAY_BUFFER, 0);

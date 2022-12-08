@@ -1,11 +1,11 @@
-#ifndef BUILDING_H
-#define BUILDING_H
+#ifndef TIEREDBUILDING_H
+#define TIEREDBUILDING_H
 
 #include <vector>
 #include <glm/glm.hpp>
 
 
-class Building
+class TieredBuilding
 {
 public:
     void updateParams(int param1, int size, int height, int depth, float x, float z, int texture);
@@ -26,4 +26,4 @@ private:
 };
 
 
-#endif // BUILDING_H
+#endif // TIEREDBUILDING_H

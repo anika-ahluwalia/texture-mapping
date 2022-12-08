@@ -8,7 +8,7 @@ Camera::Camera(SceneCameraData& camera_data, int width, int height, float nearPl
     s_width = width;
     s_height = height;
     near_plane = nearPlane;
-    far_plane = farPlane;
+    far_plane = 100.f;
 
     view_matrix = createViewMatrix();
     inverse_view_matrix = createInverseViewMatrix();

@@ -1,124 +1,112 @@
-#include "cylinder.h"
-#include "glm/gtc/constants.hpp"
-#include "glm/gtx/transform.hpp"
-#include "glm/gtc/matrix_transform.hpp"
+#include "Cylinder.h"
 
-void Cylinder::updateParams(int param1, int param2) {
+void Cylinder::updateParams(int param1, int param2, float x, float y, float z, float radius) {
     m_vertexData = std::vector<float>();
     m_param1 = param1;
     m_param2 = param2;
+    m_x = x;
+    m_y = y;
+    m_z = z;
+    m_radius = radius;
     setVertexData();
 }
 
 void Cylinder::makeTile(glm::vec3 topLeft,
-                      glm::vec3 topRight,
-                      glm::vec3 bottomLeft,
-                      glm::vec3 bottomRight) {
-    insertVec3(m_vertexData, topLeft);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(topLeft[0], 0, topLeft[2])));
-    insertVec3(m_vertexData, bottomLeft);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(bottomLeft[0], 0, bottomLeft[2])));
-    insertVec3(m_vertexData, bottomRight);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(bottomRight[0], 0, bottomRight[2])));
-    insertVec3(m_vertexData, topRight);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(topRight[0], 0, topRight[2])));
-    insertVec3(m_vertexData, topLeft);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(topLeft[0], 0, topLeft[2])));
-    insertVec3(m_vertexData, bottomRight);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(bottomRight[0], 0, bottomRight[2])));
-}
-
-void Cylinder::makeFlatTile(glm::vec3 topLeft,
-                      glm::vec3 topRight,
-                      glm::vec3 bottomLeft,
-                      glm::vec3 bottomRight) {
-    insertVec3(m_vertexData, topLeft);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(0, topLeft[1], 0)));
-    insertVec3(m_vertexData, bottomLeft);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(0, bottomLeft[1], 0)));
-    insertVec3(m_vertexData, bottomRight);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(0, bottomRight[1], 0)));
-    insertVec3(m_vertexData, topRight);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(0, topRight[1], 0)));
-    insertVec3(m_vertexData, topLeft);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(0, topLeft[1], 0)));
-    insertVec3(m_vertexData, bottomRight);
-    insertVec3(m_vertexData, glm::normalize(glm::vec3(0, bottomRight[1], 0)));
-}
-
-glm::vec3 Cylinder::makeCoordinate(float theta, float height) {
-    float radius = 0.5f;
-    float x = radius * glm::sin(theta);
-    float y = height;
-    float z = radius * glm::cos(theta);
-    return glm::vec3{ x, y, z };
-}
-
-glm::vec3 Cylinder::makeFlatCoordinate(float phi, float theta, float height) {
-    float radius = 0.5f;
-    float x = radius * glm::sin(phi) * glm::sin(theta);
-    float y = height;
-    float z = radius * glm::sin(phi) * glm::cos(theta);
-    return glm::vec3{ x, y, z };
-}
-
-void Cylinder::makeWedge(float currentTheta, float nextTheta) {
-
-    float currHeight = -0.5f;
-    float heightIncrement = 1.f / m_param1;
-    for (int i = 0; i < m_param1; i++) {
-
-        glm::vec3 topLeft = makeCoordinate(currentTheta, currHeight + heightIncrement);
-        glm::vec3 topRight = makeCoordinate(nextTheta, currHeight + heightIncrement);
-        glm::vec3 bottomLeft = makeCoordinate(currentTheta, currHeight);
-        glm::vec3 bottomRight = makeCoordinate(nextTheta, currHeight);
-
-        currHeight += heightIncrement;
-
-        makeTile(topLeft, topRight, bottomLeft, bottomRight);
+                        glm::vec3 topRight,
+                        glm::vec3 bottomLeft,
+                        glm::vec3 bottomRight,
+                        int cap) {
+    glm::vec3 topLeftNorm;
+    glm::vec3 bottomLeftNorm;
+    glm::vec3 bottomRightNorm;
+    glm::vec3 topRightNorm;
+    if (cap == 0) {
+        topLeftNorm = glm::normalize(glm::vec3(topLeft.x, 0, topLeft.z));
+        bottomLeftNorm = glm::normalize(glm::vec3(bottomLeft.x, 0, bottomLeft.z));
+        bottomRightNorm = glm::normalize(glm::vec3(bottomRight.x, 0, bottomRight.z));
+        topRightNorm = glm::normalize(glm::vec3(topRight.x, 0, topRight.z));
+    } else if (cap == -1) {
+        topLeftNorm = glm::vec3(0, -1, 0);
+        bottomLeftNorm = glm::vec3(0, -1, 0);
+        bottomRightNorm = glm::vec3(0, -1, 0);
+        topRightNorm = glm::vec3(0, -1, 0);
+    } else {
+        topLeftNorm = glm::vec3(0, 1, 0);
+        bottomLeftNorm = glm::vec3(0, 1, 0);
+        bottomRightNorm = glm::vec3(0, 1, 0);
+        topRightNorm = glm::vec3(0, 1, 0);
     }
+
+    insertVec3(m_vertexData, topLeft);
+    insertVec3(m_vertexData, topLeftNorm);
+    insertVec2(m_vertexData, glm::vec2{0.f, 1.f});
+    insertVec3(m_vertexData, bottomLeft);
+    insertVec3(m_vertexData, bottomLeftNorm);
+    insertVec2(m_vertexData, glm::vec2{0.f, 0.f});
+    insertVec3(m_vertexData, topRight);
+    insertVec3(m_vertexData, topRightNorm);
+    insertVec2(m_vertexData, glm::vec2{1.f, 1.f});
+
+    insertVec3(m_vertexData, topRight);
+    insertVec3(m_vertexData, topRightNorm);
+    insertVec2(m_vertexData, glm::vec2{1.f, 1.f});
+    insertVec3(m_vertexData, bottomLeft);
+    insertVec3(m_vertexData, bottomLeftNorm);
+    insertVec2(m_vertexData, glm::vec2{0.f, 0.f});
+    insertVec3(m_vertexData, bottomRight);
+    insertVec3(m_vertexData, bottomRightNorm);
+    insertVec2(m_vertexData, glm::vec2{1.f, 0.f});
 }
 
-void Cylinder::makeFlatWedges(float currentTheta, float nextTheta) {
-    float phi_increment = glm::radians(90.f / m_param1);
+void Cylinder::setVertexData() {
+    auto cylindrical = [=](float r, float theta, float y) {
+        return glm::vec3{
+            r * sin(theta) - m_x,
+            y,
+            r * cos(theta) - m_z
+        };
+    };
 
-    for (int i = 0; i < m_param1; i++) {
-        float innerPhi = i * phi_increment;
-        float outerPhi = (i + 1) * phi_increment;
+    int param1 = std::max(m_param1, 1);
+    int param2 = std::max(m_param2, 3);
 
-        for (float height = -0.5f; height < 1; height++) {
-            glm::vec3 topLeft = makeFlatCoordinate(outerPhi, currentTheta, height);
-            glm::vec3 topRight = makeFlatCoordinate(outerPhi, nextTheta, height);
-            glm::vec3 bottomLeft = makeFlatCoordinate(innerPhi, currentTheta, height);
-            glm::vec3 bottomRight = makeFlatCoordinate(innerPhi, nextTheta, height);
+    float thetaStep = glm::radians(360.f / param2);
+    float yStep = 1.0f / param1;
+    float rStep = -m_radius / param1;
 
-            if (height == 0.5) {
-                glm::vec3 stored = topLeft;
-                topLeft = topRight;
-                topRight = stored;
-                stored = bottomLeft;
-                bottomLeft = bottomRight;
-                bottomRight = stored;
-            }
-
-            makeFlatTile(topLeft, topRight, bottomLeft, bottomRight);
+    for (int i = 0; i < param2; i++) {
+        float currentTheta = i * thetaStep;
+        float nextTheta = currentTheta + thetaStep;
+        for (int j = 0; j < param1; j++) {
+            float currentY = j * yStep - m_y;
+            float nextY = currentY + yStep;
+            float currentR = j * rStep + 0.5f;
+            float nextR = currentR + rStep;
+            // side
+            makeTile(cylindrical(0.5f, currentTheta, nextY),
+                     cylindrical(0.5f, nextTheta, nextY),
+                     cylindrical(0.5f, currentTheta, currentY),
+                     cylindrical(0.5f, nextTheta, currentY),
+                     0);
+            // top cap
+            makeTile(cylindrical(nextR, currentTheta, m_y + -1.5f),
+                     cylindrical(nextR, nextTheta, m_y + -1.5f),
+                     cylindrical(currentR, currentTheta, m_y + -1.5f),
+                     cylindrical(currentR, nextTheta, m_y + -1.5f),
+                     1);
+            // bottom cap
+            makeTile(cylindrical(nextR, nextTheta, m_y + -0.5f),
+                     cylindrical(nextR, currentTheta, m_y + -0.5f),
+                     cylindrical(currentR, nextTheta, m_y + -0.5f),
+                     cylindrical(currentR, currentTheta, m_y + -0.5f),
+                     -1);
         }
     }
 }
 
-
-void Cylinder::makeCylinder() {
-    float thetaStep = glm::radians(360.f / m_param2);
-    for (int i = 0; i < m_param2; i++) {
-        float currentTheta = i * thetaStep;
-        float nextTheta = (i + 1) * thetaStep;
-        makeWedge(currentTheta, nextTheta);
-        makeFlatWedges(currentTheta, nextTheta);
-    }
-}
-
-void Cylinder::setVertexData() {
-    makeCylinder();
+void Cylinder::insertVec2(std::vector<float> &data, glm::vec2 v) {
+    data.push_back(v.x);
+    data.push_back(v.y);
 }
 
 void Cylinder::insertVec3(std::vector<float> &data, glm::vec3 v) {

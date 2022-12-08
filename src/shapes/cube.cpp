@@ -1,13 +1,13 @@
 #include "cube.h"
 #include <iostream>
 
-void Cube::updateParams(int param1, float x, float y, float z, int texture) {
+void Cube::updateParams(int param1, float dimension, float x, float y, float z) {
     m_vertexData = std::vector<float>();
     m_param1 = param1;
+    m_dim = dimension;
     m_x = x;
     m_y = y;
     m_z = z;
-    m_texture = texture;
     setVertexData();
 }
 
@@ -131,35 +131,35 @@ void Cube::makeFace(glm::vec3 topLeft,
 
 void Cube::setVertexData() {
 
-     makeFace(glm::vec3(m_x,       m_y + 1.f, m_z + 1.f),
-              glm::vec3(m_x + 1.f, m_y + 1.f, m_z + 1.f),
-              glm::vec3(m_x,       m_y,       m_z + 1.f),
-              glm::vec3(m_x + 1.f, m_y,       m_z + 1.f));
+     makeFace(glm::vec3(m_x,         m_y + m_dim, m_z + m_dim),
+              glm::vec3(m_x + m_dim, m_y + m_dim, m_z + m_dim),
+              glm::vec3(m_x,         m_y,         m_z + m_dim),
+              glm::vec3(m_x + m_dim, m_y,         m_z + m_dim));
 
-     makeFace(glm::vec3(m_x,       m_y,       m_z),
-              glm::vec3(m_x + 1.f, m_y,       m_z),
-              glm::vec3(m_x,       m_y + 1.f, m_z),
-              glm::vec3(m_x + 1.f, m_y + 1.f, m_z));
+     makeFace(glm::vec3(m_x,         m_y,         m_z),
+              glm::vec3(m_x + m_dim, m_y,         m_z),
+              glm::vec3(m_x,         m_y + m_dim, m_z),
+              glm::vec3(m_x + m_dim, m_y + m_dim, m_z));
 
-     makeFace(glm::vec3(m_x + 1.f, m_y,       m_z),
-              glm::vec3(m_x + 1.f, m_y,       m_z + 1.f),
-              glm::vec3(m_x + 1.f, m_y + 1.f, m_z),
-              glm::vec3(m_x + 1.f, m_y + 1.f, m_z + 1.f));
+     makeFace(glm::vec3(m_x + m_dim, m_y,         m_z),
+              glm::vec3(m_x + m_dim, m_y,         m_z + m_dim),
+              glm::vec3(m_x + m_dim, m_y + m_dim, m_z),
+              glm::vec3(m_x + m_dim, m_y + m_dim, m_z + m_dim));
 
-     makeFace(glm::vec3(m_x,       m_y + 1.f, m_z),
-              glm::vec3(m_x,       m_y + 1.f, m_z + 1.f),
-              glm::vec3(m_x,       m_y,       m_z),
-              glm::vec3(m_x,       m_y,       m_z + 1.f));
+     makeFace(glm::vec3(m_x,       m_y + m_dim, m_z),
+              glm::vec3(m_x,       m_y + m_dim, m_z + m_dim),
+              glm::vec3(m_x,       m_y,         m_z),
+              glm::vec3(m_x,       m_y,         m_z + m_dim));
 
-     makeFace(glm::vec3(m_x,       m_y + 1.f, m_z),
-              glm::vec3(m_x + 1.f, m_y + 1.f, m_z),
-              glm::vec3(m_x,       m_y + 1.f, m_z + 1.f),
-              glm::vec3(m_x + 1.f, m_y + 1.f, m_z + 1.f));
+     makeFace(glm::vec3(m_x,         m_y + m_dim, m_z),
+              glm::vec3(m_x + m_dim, m_y + m_dim, m_z),
+              glm::vec3(m_x,         m_y + m_dim, m_z + m_dim),
+              glm::vec3(m_x + m_dim, m_y + m_dim, m_z + m_dim));
 
-     makeFace(glm::vec3(m_x,       m_y,       m_z + 1.f),
-              glm::vec3(m_x + 1.f, m_y,       m_z + 1.f),
-              glm::vec3(m_x,       m_y,       m_z),
-              glm::vec3(m_x + 1.f, m_y,       m_z));
+     makeFace(glm::vec3(m_x,         m_y,       m_z + m_dim),
+              glm::vec3(m_x + m_dim, m_y,       m_z + m_dim),
+              glm::vec3(m_x,         m_y,       m_z),
+              glm::vec3(m_x + m_dim, m_y,       m_z));
 
 }
 
