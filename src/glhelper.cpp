@@ -24,7 +24,7 @@ void GLHelper::cleanMemory() {
 
 void GLHelper::generateBuilding(int size, int height, float x, float z) {
     Building building = Building();
-    building.updateParams(20, 20, 5, 2, 1, 1, 3);
+    building.updateParams(15, 15, 5, 2, 1, 1, 3);
     building_data = building.getMesh();
     createVAOVBO(building_vbo, building_vao, building_data);
 
